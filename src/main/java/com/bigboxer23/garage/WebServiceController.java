@@ -5,7 +5,6 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.logging.Logger;
 
 /**
  * Controller to return data about sensor's input
@@ -22,10 +21,6 @@ public class WebServiceController extends BaseService
 	@RequestMapping("/Status2")
 	public String getStatus()
 	{
-		if (true)
-		{
-			return "true";  
-		}
 		myLogger.config("Checking status requested");
 		return "{\"temperature\":" + myWeatherService.getTemperature()
 				+ ",\"humidity\":" + myWeatherService.getHumidity() +
