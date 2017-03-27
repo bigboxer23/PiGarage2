@@ -1,11 +1,8 @@
 package com.bigboxer23.garage.services;
 
-import com.bigboxer23.garage.GarageOpenerApplication;
 import com.bigboxer23.garage.util.GPIOUtils;
 import com.pi4j.io.gpio.*;
-import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,24 +34,29 @@ public class GarageDoorMotionService extends BaseService
 	{
 		GpioController aGPIOFactory = GpioFactory.getInstance();
 		myStatusPin = aGPIOFactory.provisionDigitalInputPin(kMotionPin, PinPullResistance.PULL_DOWN);
-		myStatusPin.addListener(new GpioPinListenerDigital()
+		/*
+		 * Listen for status changes, inform the status service we're working so it won't auto
+		 * close the door.
+		 *
+		 * @param theEvent
+		 */
+		myStatusPin.addListener((GpioPinListenerDigital) theEvent ->
 		{
-			/*
-			 * Listen for status changes, inform the status service we're working so it won't auto
-			 * close the door.
-			 *
-			 * @param theEvent
-			 */
-			@Override
-			public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent theEvent)
+			if (isMotionDetected() && (myLastTime == -1 || System.currentTimeMillis() - myLastTime > kDelay))
 			{
-				if (isMotionDetected() && (System.currentTimeMillis() - myLastTime) > kDelay)
-				{
-					myLastTime = System.currentTimeMillis();
-					myLogger.warning("Motion detected!");
-					myStatusService.resetOpenTime();
-				}
+				myLogger.warning("Motion detected.");
+				myLastTime = System.currentTimeMillis();
+				return;
 			}
+			myLastTime = -1;
+			myLogger.warning("Motion detected again, reseting close time");
+			myStatusService.resetOpenTime();
+			/*if (isMotionDetected() && (System.currentTimeMillis() - myLastTime) > kDelay)
+			{
+				myLastTime = System.currentTimeMillis();
+				myLogger.warning("Motion detected!");
+				myStatusService.resetOpenTime();
+			}*/
 		});
 	}
 

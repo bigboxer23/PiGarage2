@@ -1,8 +1,10 @@
 package com.bigboxer23.garage.services;
 
-import com.bigboxer23.garage.GarageOpenerApplication;
+import com.bigboxer23.garage.util.http.HttpClientUtil;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
 
 import java.util.logging.Level;
 
@@ -13,28 +15,33 @@ import java.util.logging.Level;
 @Component
 public class CommunicationService extends BaseService
 {
-	private static String kHubUrl = System.getProperty("HubURL");//, "http://192.168.0.7:8080/Lights/S/Notification/Garage");
+	@Value("${GarageOpenUrl}")
+	private String kOpenUrl;
+
+	@Value("${GarageCloseUrl}")
+	private String kCloseUrl;
 
 	public void garageDoorOpened()
 	{
-		doAction("Opened");
+		doAction(kOpenUrl);
 	}
 
 	public void garageDoorClosed()
 	{
-		//doAction("Closed");
+		doAction(kCloseUrl);
 	}
 
-	private void doAction(String theAction)
+	private void doAction(String theUrl)
 	{
-		if (kHubUrl == null)
+		if (theUrl == null || theUrl.length() == 0)
 		{
 			return;
 		}
 		try
 		{
-//			URLConnection aConnection = new URL(kHubUrl + "/" + theAction).openConnection();
-//			new String(ByteStreams.toByteArray(aConnection.getInputStream()), Charsets.UTF_8);
+			DefaultHttpClient aClient = HttpClientUtil.getSSLDisabledHttpClient();
+			HttpGet aGet = new HttpGet(theUrl);
+			aClient.execute(aGet);
 		}
 		catch (Throwable e)
 		{

@@ -1,6 +1,5 @@
 package com.bigboxer23.garage.services;
 
-import com.bigboxer23.garage.GarageOpenerApplication;
 import com.bigboxer23.garage.util.GPIOUtils;
 import com.pi4j.io.gpio.*;
 import org.springframework.stereotype.Component;
@@ -38,7 +37,6 @@ public class GarageDoorActionService extends BaseService
 		{
 			myLogger.config("Closing the door.");
 			doDoorAction();
-			myCommunicationService.garageDoorClosed();
 		}
 	}
 
@@ -51,7 +49,6 @@ public class GarageDoorActionService extends BaseService
 		{
 			myLogger.config("Opening the door.");
 			doDoorAction();
-			myCommunicationService.garageDoorOpened();
 		}
 	}
 

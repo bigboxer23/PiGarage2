@@ -54,11 +54,13 @@ public class GarageDoorStatusService extends BaseService
 			{
 				myOpenTime = System.currentTimeMillis() + kAutoCloseDelay;
 				myLogger.warning("Garage Door Opened.");
+				myCommunicationService.garageDoorOpened();
 			}
 			if(!isGarageDoorOpen() && myOpenTime != -1)
 			{
 				myOpenTime = -1;
 				myLogger.warning("Garage Door Closed.");
+				myCommunicationService.garageDoorClosed();
 			}
 		});
 		if(isGarageDoorOpen())
