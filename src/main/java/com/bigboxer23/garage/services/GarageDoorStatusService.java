@@ -108,9 +108,10 @@ public class GarageDoorStatusService extends BaseService
 	/**
 	 * Check if we're open and if we've been opened too long.  If so, use the action service to close the door.
 	 */
-	@Scheduled(fixedRate = 2000)
+	@Scheduled(fixedRate = 10000)
 	public void iterate()
 	{
+		myLogger.config("open time: " + myOpenTime + " current: " + System.currentTimeMillis() + " check: " + (System.currentTimeMillis() - myOpenTime));
 		if(myOpenTime > 0 && (System.currentTimeMillis() - myOpenTime) > 0)
 		{
 			myLogger.warning("Garage has been open too long, closing.");
