@@ -46,7 +46,12 @@
 		<dependency>
 			<groupId>com.pi4j</groupId>
 			<artifactId>pi4j-core</artifactId>
-			<version>1.0</version>
+			<version>1.2-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>de.codecentric</groupId>
+			<artifactId>spring-boot-admin-starter-client</artifactId>
+			<version>1.4.6</version>
 		</dependency>
 	</dependencies>
 	
@@ -72,4 +77,15 @@
 			<url>scp://pi@192.168.0.8:/home/pi</url>
 		</repository>
 	</distributionManagement>
+	<repositories>
+		<repository>
+			<id>oss-snapshots-repo</id>
+			<name>Sonatype OSS Maven Repository</name>
+			<url>https://oss.sonatype.org/content/groups/public</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+	</repositories>
 </project>
