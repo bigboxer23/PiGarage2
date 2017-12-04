@@ -21,8 +21,12 @@ public class CommunicationService extends BaseService
 	@Value("${GarageCloseUrl}")
 	private String kCloseUrl;
 
+	@Value("${GarageNotificationUrl}")
+	private String kNotificationUrl;
+
 	public void garageDoorOpened()
 	{
+		doAction(kNotificationUrl);
 		doAction(kOpenUrl);
 	}
 
