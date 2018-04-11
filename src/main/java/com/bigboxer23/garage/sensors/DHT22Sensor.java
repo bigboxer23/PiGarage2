@@ -1,7 +1,8 @@
 package com.bigboxer23.garage.sensors;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import org.apache.commons.io.IOUtils;
+
+import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,11 +16,10 @@ public class DHT22Sensor
 
 	private final static String kTemp = "Temp =";
 	private final static String kHumidity = "Hum =";
-	private static final long kPollingInterval = 3000;
+	private static final long kPollingInterval = 60000;
 
 	private final int myPin;
 	private String myLastValue;
-	private long myLastCheck;
 
 	/**
 	 *
@@ -28,33 +28,40 @@ public class DHT22Sensor
 	public DHT22Sensor(int thePin)
 	{
 		myPin = thePin;
+		new Thread(() -> {
+			while(true)
+			{
+				checkForUpdates();
+				try
+				{
+					Thread.sleep(kPollingInterval);
+				}
+				catch (InterruptedException theE)
+				{
+					theE.printStackTrace();
+				}
+			}
+		}).start();
 	}
 
-	public synchronized float getHumidity()
+	public float getHumidity()
 	{
-		checkForUpdates();
 		return parseHumidity(myLastValue);
 	}
 
 	private void checkForUpdates()
 	{
-		long aNow = System.currentTimeMillis();
-		if (aNow - myLastCheck > kPollingInterval)
+		String aValues = readValues();
+		myLogger.config("Values read: " + aValues);
+		if (aValues != null && aValues.indexOf('%') > 0)
 		{
-			String aValues = readValues();
-			myLogger.config("Values read: " + aValues);
-			if (aValues != null && aValues.indexOf('%') > 0)
-			{
-				myLogger.config("Updating values.");
-				myLastValue = aValues;
-			}
-			myLastCheck = aNow;
+			myLogger.config("Updating values.");
+			myLastValue = aValues;
 		}
 	}
 
 	public synchronized float getTemperature()
 	{
-		checkForUpdates();
 		return parseTemperature(myLastValue);
 	}
 
@@ -79,25 +86,27 @@ public class DHT22Sensor
 
 	private String readValues()
 	{
-		String aResult = "";
 		try
 		{
-			myLogger.config("Reading value from sensor");
-			Process aProcess = Runtime.getRuntime().exec(String.format("Adafruit_DHT 22 %d", myPin));
-			BufferedReader aReader = new BufferedReader(new InputStreamReader(aProcess.getInputStream()));
-			String aLine = null;
-			while ((aLine = aReader.readLine()) != null)
+			for(int ai = 0; ai < 10; ai++)
 			{
-				myLogger.config("reading line: " + aLine);
-				aResult += aLine;
+				myLogger.config("Reading value from sensor");
+				Process aProcess = Runtime.getRuntime().exec(String.format("Adafruit_DHT 22 %d", myPin));
+				String aResult = IOUtils.toString(aProcess.getInputStream(), Charset.defaultCharset());
+				myLogger.config("done reading value from sensor...");
+				if (aResult.contains("Temp"))
+				{
+					return aResult;
+				}
+				myLogger.config("Bad result from sensor " + aResult);
+				Thread.sleep(1000);
 			}
-			myLogger.config("done reading value from sensor...");
+			return null;
 		}
 		catch (Exception theException)
 		{
 			myLogger.log(Level.WARNING, String.format("Could not read the DHT22 sensor at pin %d", myPin), theException);
 			return null;
 		}
-		return aResult;
 	}
 }
