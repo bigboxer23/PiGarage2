@@ -1,6 +1,6 @@
 package com.bigboxer23.garage.services;
 
-import com.bigboxer23.garage.util.http.HttpClientUtil;
+import com.bigboxer23.garage.util.http.HttpClientUtils;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,9 +43,7 @@ public class CommunicationService extends BaseService
 		}
 		try
 		{
-			DefaultHttpClient aClient = HttpClientUtil.getSSLDisabledHttpClient();
-			HttpGet aGet = new HttpGet(theUrl);
-			aClient.execute(aGet);
+			HttpClientUtils.getInstance().execute(new HttpGet(theUrl));
 		}
 		catch (Throwable e)
 		{
