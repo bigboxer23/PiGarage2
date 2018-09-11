@@ -53,13 +53,13 @@ public class GarageDoorStatusService extends BaseService
 			if(isGarageDoorOpen() && myOpenTime < 0)
 			{
 				myOpenTime = System.currentTimeMillis() + kAutoCloseDelay;
-				myLogger.warning("Garage Door Opened.");
+				myLogger.info("Garage Door Opened.");
 				myCommunicationService.garageDoorOpened();
 			}
 			if(!isGarageDoorOpen() && myOpenTime != -1)
 			{
 				myOpenTime = -1;
-				myLogger.warning("Garage Door Closed.");
+				myLogger.info("Garage Door Closed.");
 				myCommunicationService.garageDoorClosed();
 			}
 		});
@@ -67,14 +67,14 @@ public class GarageDoorStatusService extends BaseService
 		{
 			myOpenTime = System.currentTimeMillis() + kAutoCloseDelay;
 		}
-		myLogger.warning("GarageDoorStatusService Startup:" + (isGarageDoorOpen() ? "Garage Door Opened." : "Garage Door Closed."));
+		myLogger.info("GarageDoorStatusService Startup:" + (isGarageDoorOpen() ? "Garage Door Opened." : "Garage Door Closed."));
 	}
 
 	public void resetOpenTime()
 	{
 		if(isGarageDoorOpen() && myOpenTime > 0 && (myOpenTime - System.currentTimeMillis()) < kAutoCloseDelay)
 		{
-			myLogger.warning("Resetting open time");
+			myLogger.info("Resetting open time");
 			myOpenTime = System.currentTimeMillis() + kAutoCloseDelay;
 		}
 	}
@@ -101,7 +101,7 @@ public class GarageDoorStatusService extends BaseService
 	 */
 	public void disableAutoClose()
 	{
-		myLogger.warning("disabling auto close.");
+		myLogger.info("disabling auto close.");
 		myOpenTime = System.currentTimeMillis() + (10 * kAutoCloseDelay);
 	}
 
@@ -111,10 +111,10 @@ public class GarageDoorStatusService extends BaseService
 	@Scheduled(fixedRate = 10000)
 	public void iterate()
 	{
-		myLogger.config("open time: " + myOpenTime + " current: " + System.currentTimeMillis() + " check: " + (System.currentTimeMillis() - myOpenTime));
+		myLogger.debug("open time: " + myOpenTime + " current: " + System.currentTimeMillis() + " check: " + (System.currentTimeMillis() - myOpenTime));
 		if(myOpenTime > 0 && (System.currentTimeMillis() - myOpenTime) > 0)
 		{
-			myLogger.warning("Garage has been open too long, closing.");
+			myLogger.info("Garage has been open too long, closing.");
 			myOpenTime = System.currentTimeMillis() + kAutoCloseDelay;
 			myActionService.closeDoor();
 		}

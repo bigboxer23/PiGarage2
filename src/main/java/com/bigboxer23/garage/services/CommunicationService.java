@@ -47,7 +47,7 @@ public class CommunicationService extends BaseService
 		}
 		catch (Throwable e)
 		{
-			myLogger.log(Level.WARNING, "GarageController: ", e);
+			myLogger.error("GarageController: ", e);
 		}
 	}
 }

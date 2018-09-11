@@ -21,7 +21,7 @@ public class WebServiceController extends BaseService
 	@RequestMapping("/Status2")
 	public String getStatus()
 	{
-		myLogger.config("Checking status requested");
+		myLogger.debug("Checking status requested");
 		return "{\"temperature\":" + myWeatherService.getTemperature()
 				+ ",\"humidity\":" + myWeatherService.getHumidity() +
 				",\"door\":" + myStatusService.isGarageDoorOpen() +
@@ -31,7 +31,7 @@ public class WebServiceController extends BaseService
 	@RequestMapping("/Close")
 	public String close()
 	{
-		myLogger.warning("Closing door requested");
+		myLogger.info("Closing door requested");
 		myActionService.closeDoor();
 		return "\"Closing\"";
 	}
@@ -39,7 +39,7 @@ public class WebServiceController extends BaseService
 	@RequestMapping("/Open")
 	public String open()
 	{
-		myLogger.warning("Opening door requested");
+		myLogger.info("Opening door requested");
 		myActionService.openDoor();
 		return "\"Opening\"";
 	}

@@ -35,7 +35,7 @@ public class GarageDoorActionService extends BaseService
 	{
 		if(myStatusService.isGarageDoorOpen())
 		{
-			myLogger.config("Closing the door.");
+			myLogger.debug("Closing the door.");
 			doDoorAction();
 		}
 	}
@@ -47,7 +47,7 @@ public class GarageDoorActionService extends BaseService
 	{
 		if(!myStatusService.isGarageDoorOpen())
 		{
-			myLogger.config("Opening the door.");
+			myLogger.debug("Opening the door.");
 			doDoorAction();
 		}
 	}

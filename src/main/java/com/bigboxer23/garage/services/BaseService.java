@@ -1,15 +1,15 @@
 package com.bigboxer23.garage.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.logging.Logger;
 
 /**
  * wrap get/set of controller
  */
 public abstract class BaseService
 {
-	protected static Logger myLogger = Logger.getLogger("com.bigboxer23.BaseService");
+	protected static final Logger myLogger = LoggerFactory.getLogger(BaseService.class);
 
 	protected GarageDoorMotionService myMotionService;
 

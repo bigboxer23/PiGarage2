@@ -11,17 +11,11 @@ import java.io.IOException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 @SpringBootApplication
 @EnableScheduling
 public class GarageOpenerApplication implements SchedulingConfigurer
 {
-	private static Logger myLogger = Logger.getLogger("com.bigboxer23");
-
 	public static void main(String[] args)
 	{
 		SpringApplication.run(GarageOpenerApplication.class, args);
@@ -29,15 +23,6 @@ public class GarageOpenerApplication implements SchedulingConfigurer
 
 	public GarageOpenerApplication() throws IOException
 	{
-		setupLogger();
-	}
-
-	private void setupLogger() throws IOException
-	{
-		FileHandler aHandler = new FileHandler(System.getProperty("log.location", "/home/pi/garage/logs/piGarage.log"), true);
-		aHandler.setFormatter(new SimpleFormatter());
-		myLogger.addHandler(aHandler);
-		myLogger.setLevel(Level.parse(System.getProperty("log.level", "WARNING")));
 	}
 
 	@Override

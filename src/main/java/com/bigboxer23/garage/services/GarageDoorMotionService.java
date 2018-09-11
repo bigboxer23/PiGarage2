@@ -44,12 +44,12 @@ public class GarageDoorMotionService extends BaseService
 		{
 			if (isMotionDetected() && (myLastTime == -1 || System.currentTimeMillis() - myLastTime > kDelay))
 			{
-				myLogger.warning("Motion detected.");
+				myLogger.info("Motion detected.");
 				myLastTime = System.currentTimeMillis();
 				return;
 			}
 			myLastTime = -1;
-			myLogger.warning("Motion detected again, reseting close time");
+			myLogger.info("Motion detected again, reseting close time");
 			myStatusService.resetOpenTime();
 			/*if (isMotionDetected() && (System.currentTimeMillis() - myLastTime) > kDelay)
 			{
