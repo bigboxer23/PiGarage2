@@ -92,7 +92,7 @@ public class GarageDoorStatusService extends BaseService
 	public boolean isGarageDoorOpen()
 	{
 		boolean anIsOpen = !myStatusPin.getState().isHigh();
-		myLogger.info("Garage is " + (anIsOpen ? "Open" : "Closed"));
+		myLogger.debug("Garage is " + (anIsOpen ? "Open" : "Closed"));
 		return anIsOpen;
 	}
 
