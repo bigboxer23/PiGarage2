@@ -44,19 +44,13 @@ public class GarageDoorMotionService extends BaseService
 		{
 			if (isMotionDetected() && (myLastTime == -1 || System.currentTimeMillis() - myLastTime > kDelay))
 			{
-				myLogger.info("Motion detected.");
+				myLogger.debug("Motion detected, within debounce time, ignoring.");
 				myLastTime = System.currentTimeMillis();
 				return;
 			}
 			myLastTime = -1;
-			myLogger.info("Motion detected again, reseting close time");
+			myLogger.info("Motion detected.");
 			myStatusService.resetOpenTime();
-			/*if (isMotionDetected() && (System.currentTimeMillis() - myLastTime) > kDelay)
-			{
-				myLastTime = System.currentTimeMillis();
-				myLogger.warning("Motion detected!");
-				myStatusService.resetOpenTime();
-			}*/
 		});
 	}
 

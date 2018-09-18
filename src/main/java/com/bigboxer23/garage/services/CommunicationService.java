@@ -1,12 +1,10 @@
 package com.bigboxer23.garage.services;
 
-import com.bigboxer23.garage.util.http.HttpClientUtils;
+import com.bigboxer23.util.http.HttpClientUtils;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.logging.Level;
 
 /**
  * Service to communicate status changes back to a central hub.  If hub url
@@ -41,13 +39,6 @@ public class CommunicationService extends BaseService
 		{
 			return;
 		}
-		try
-		{
-			HttpClientUtils.getInstance().execute(new HttpGet(theUrl));
-		}
-		catch (Throwable e)
-		{
-			myLogger.error("GarageController: ", e);
-		}
+		HttpClientUtils.execute(new HttpGet(theUrl));
 	}
 }

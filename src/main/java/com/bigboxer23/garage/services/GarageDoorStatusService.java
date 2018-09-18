@@ -74,7 +74,7 @@ public class GarageDoorStatusService extends BaseService
 	{
 		if(isGarageDoorOpen() && myOpenTime > 0 && (myOpenTime - System.currentTimeMillis()) < kAutoCloseDelay)
 		{
-			myLogger.info("Resetting open time");
+			myLogger.info("Resetting close time");
 			myOpenTime = System.currentTimeMillis() + kAutoCloseDelay;
 		}
 	}
