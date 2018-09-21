@@ -32,6 +32,16 @@ public class GarageDoorStatusService extends BaseService
 	private long myOpenTime = -1;
 
 	/**
+	 * Delay before measuring for real again
+	 */
+	private long myChangingStateDelay = -1;
+
+	/**
+	 * During state change delay, the value to return
+	 */
+	private boolean myTempState = false;
+
+	/**
 	 * Pin to get our status from
 	 */
 	private GpioPinDigitalInput myStatusPin;
@@ -89,8 +99,24 @@ public class GarageDoorStatusService extends BaseService
 		return myOpenTime > 0 ? (myOpenTime - System.currentTimeMillis()) : 0;
 	}
 
+	/**
+	 * Garage door is going open -> close or close -> open.
+	 * Takes 12 secs to get there, don't want to return non-correct status until it's actually changed.
+	 */
+	public void changingState()
+	{
+		myTempState = !isGarageDoorOpen();
+		//Garage door takes 12 seconds to open, only get state after that amount of time has passed.
+		myChangingStateDelay = System.currentTimeMillis() + (12 * 1000);
+	}
+
 	public boolean isGarageDoorOpen()
 	{
+		if (myChangingStateDelay > System.currentTimeMillis())
+		{
+			return myTempState;
+		}
+		myChangingStateDelay = -1;
 		boolean anIsOpen = !myStatusPin.getState().isHigh();
 		myLogger.debug("Garage is " + (anIsOpen ? "Open" : "Closed"));
 		return anIsOpen;

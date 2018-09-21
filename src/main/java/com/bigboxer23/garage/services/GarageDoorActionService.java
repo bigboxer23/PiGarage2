@@ -58,12 +58,13 @@ public class GarageDoorActionService extends BaseService
 	 */
 	private void doDoorAction()
 	{
-			myPinTrigger.low();
-			try
-			{
-				Thread.sleep(kTriggerDelay);
-			}
-			catch (InterruptedException e){}
-			myPinTrigger.high();
+		myStatusService.changingState();
+		myPinTrigger.low();
+		try
+		{
+			Thread.sleep(kTriggerDelay);
+		}
+		catch (InterruptedException e){}
+		myPinTrigger.high();
 	}
 }

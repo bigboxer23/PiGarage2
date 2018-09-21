@@ -93,7 +93,7 @@ public class DHT22Sensor
 			for(int ai = 0; ai < 10; ai++)
 			{
 				myLogger.debug("Reading value from sensor");
-				Process aProcess = Runtime.getRuntime().exec(String.format("Adafruit_DHT 22 %d", myPin));
+				Process aProcess = Runtime.getRuntime().exec(String.format("Adafruit_DHT 22 %d", myPin));//TODO: fix this hang...
 				String aResult = IOUtils.toString(aProcess.getInputStream(), Charset.defaultCharset());
 				myLogger.debug("done reading value from sensor...");
 				if (aResult.contains("Temp"))
