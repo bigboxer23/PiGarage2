@@ -1,12 +1,10 @@
 package com.bigboxer23.garage.sensors;
 
-import com.bigboxer23.garage.services.BaseService;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
-import java.util.logging.Level;
 
 /**
  * Wrapper around the adafruit driver to return temp and humidity from
@@ -23,6 +21,8 @@ public class DHT22Sensor
 	private final int myPin;
 	private String myLastValue;
 
+	private long myLastUpdate = System.currentTimeMillis();
+
 	/**
 	 *
 	 * @param thePin the GPIO pin number to use
@@ -30,20 +30,6 @@ public class DHT22Sensor
 	public DHT22Sensor(int thePin)
 	{
 		myPin = thePin;
-		new Thread(() -> {
-			while(true)
-			{
-				checkForUpdates();
-				try
-				{
-					Thread.sleep(kPollingInterval);
-				}
-				catch (InterruptedException theE)
-				{
-					theE.printStackTrace();
-				}
-			}
-		}).start();
 	}
 
 	public float getHumidity()
@@ -51,7 +37,7 @@ public class DHT22Sensor
 		return parseHumidity(myLastValue);
 	}
 
-	private void checkForUpdates()
+	public void checkForUpdates()
 	{
 		String aValues = readValues();
 		myLogger.debug("Values read: " + aValues);
@@ -64,6 +50,10 @@ public class DHT22Sensor
 
 	public synchronized float getTemperature()
 	{
+		if (isProcessHung())
+		{
+			killHungAdafruit_DHTProcess();
+		}
 		return parseTemperature(myLastValue);
 	}
 
@@ -93,11 +83,12 @@ public class DHT22Sensor
 			for(int ai = 0; ai < 10; ai++)
 			{
 				myLogger.debug("Reading value from sensor");
-				Process aProcess = Runtime.getRuntime().exec(String.format("Adafruit_DHT 22 %d", myPin));//TODO: fix this hang...
+				Process aProcess = Runtime.getRuntime().exec(String.format("Adafruit_DHT 22 %d", myPin));
 				String aResult = IOUtils.toString(aProcess.getInputStream(), Charset.defaultCharset());
 				myLogger.debug("done reading value from sensor...");
 				if (aResult.contains("Temp"))
 				{
+					myLastUpdate = System.currentTimeMillis();
 					return aResult;
 				}
 				myLogger.debug("Bad result from sensor " + aResult);
@@ -111,4 +102,28 @@ public class DHT22Sensor
 			return null;
 		}
 	}
+
+	/**
+	 * If process hasn't updated in > 5min, kill it, try again
+	 *
+	 * @return
+	 */
+	private boolean isProcessHung()
+	{
+		return myLastUpdate < System.currentTimeMillis() - (300000);//5 * 60 * 1000, 5min
+	}
+
+	private void killHungAdafruit_DHTProcess()
+	{
+		try
+		{
+			myLogger.error("Killing hung process, last update " + myLastUpdate);
+			Runtime.getRuntime().exec("sudo pkill -f 'Adafruit_DHT'");
+		} catch (Exception theE)
+		{
+			myLogger.error("killHungAdafruit_DHTProcess", theE);
+		}
+	}
+
+
 }

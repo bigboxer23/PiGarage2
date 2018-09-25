@@ -45,4 +45,10 @@ public class WeatherService extends BaseService
 		myCachedHumidity = mySensor.getHumidity();
 		myLastUpdate = System.currentTimeMillis();
 	}
+
+	@Scheduled(fixedRate = 60000)
+	private void queryFromSensor()
+	{
+		mySensor.checkForUpdates();
+	}
 }
