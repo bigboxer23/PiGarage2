@@ -40,7 +40,7 @@ public class GarageOpenerApplication implements SchedulingConfigurer
 	private class NamedThreadFactory implements ThreadFactory
 	{
 		public Thread newThread(Runnable theRunnable) {
-			return new Thread(theRunnable, "MyThread");
+			return new Thread(theRunnable, "Thread-" + System.currentTimeMillis());
 		}
 	}
 }

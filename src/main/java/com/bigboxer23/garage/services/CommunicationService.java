@@ -24,7 +24,9 @@ public class CommunicationService extends BaseService
 
 	public void garageDoorOpened()
 	{
+		myLogger.info("Sending Notification");
 		doAction(kNotificationUrl);
+		myLogger.info("Notification Sent");
 		doAction(kOpenUrl);
 	}
 

@@ -137,12 +137,6 @@
 			</extension>
 		</extensions>
 	</build>
-	<distributionManagement>
-		<repository>
-			<id>garagePi</id>
-			<url>scp://pi@192.168.0.8:/home/pi</url>
-		</repository>
-	</distributionManagement>
 	<repositories>
 		<repository>
 			<id>oss-snapshots-repo</id>
