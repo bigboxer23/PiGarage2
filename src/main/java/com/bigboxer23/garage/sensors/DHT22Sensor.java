@@ -117,9 +117,9 @@ public class DHT22Sensor
 	{
 		try
 		{
-			myLogger.info("Killing hung process, last update " + myLastUpdate);
+			myLogger.debug("Killing hung process, last update " + myLastUpdate);
 			Runtime.getRuntime().exec("sudo killall -9 Adafruit_DHT").waitFor();
-			myLogger.info("End killing hung process, last update " + myLastUpdate);
+			myLogger.info("Sensor process is hung, killing process. Last update " + myLastUpdate);
 		} catch (Exception theE)
 		{
 			myLogger.error("killHungAdafruit_DHTProcess", theE);
