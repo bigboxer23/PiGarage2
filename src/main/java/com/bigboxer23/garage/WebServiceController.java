@@ -61,7 +61,10 @@ public class WebServiceController extends BaseService
 	@RequestMapping("/DisableAutoClose")
 	public String disableAutoClose()
 	{
-		myStatusService.disableAutoClose();
+		if (myStatusService.isGarageDoorOpen())
+		{
+			myStatusService.disableAutoClose();
+		}
 		GarageData aData = getGarageData();
 		aData.setAutoClose(myStatusService.getAutoCloseTimeRemaining());
 		return new Gson().toJson(aData);
