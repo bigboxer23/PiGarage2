@@ -51,6 +51,7 @@ public class GarageDoorMotionService extends BaseService
 			myLastTime = -1;
 			myLogger.info("Motion detected.");
 			myStatusService.resetOpenTime();
+			myCommunicationService.motionDetected();
 		});
 	}
 

@@ -22,6 +22,9 @@ public class CommunicationService extends BaseService
 	@Value("${GarageNotificationUrl}")
 	private String kNotificationUrl;
 
+	@Value("${GarageMotionUrl}")
+	private String kMotionUrl;
+
 	public void garageDoorOpened()
 	{
 		myLogger.info("Sending Notification");
@@ -33,6 +36,11 @@ public class CommunicationService extends BaseService
 	public void garageDoorClosed()
 	{
 		doAction(kCloseUrl);
+	}
+
+	public void motionDetected()
+	{
+		doAction(kMotionUrl);
 	}
 
 	private void doAction(String theUrl)
