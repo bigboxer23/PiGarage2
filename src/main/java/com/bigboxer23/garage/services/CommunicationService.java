@@ -40,6 +40,7 @@ public class CommunicationService extends BaseService
 
 	public void motionDetected()
 	{
+		myLogger.info("informing motion url");
 		doAction(kMotionUrl);
 	}
 
