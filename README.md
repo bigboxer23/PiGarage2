@@ -1,4 +1,4 @@
-PiGarage 2.0
+PiGarage 2.1
 ========
 
 Updated from version one to use springboot to allow easy configuration of HTTPS and maven.
@@ -29,15 +29,15 @@ Ties together these two projects:<br>
 Wiring devices to the pi<br>
 Sensor for status:<br>
 	<a href="http://www.smarthome.com/7455/Seco-Larm-SM-226L-Garage-Door-Contacts-for-Closed-Circuits/p.aspx">Seco-Larm SM-226L</a><br>
-This is wired to Pin 9 and 13 (GPIO 2 by default).<br><br>
+This is wired to Pin 9 (Ground) and 13 (GPIO 2 by default).<br><br>
 
 SSR:<br>
 <a href="http://www.amazon.com/gp/product/B00E0NTPP4/ref=ox_ya_os_product_refresh_T1">Solid State Relay</a><br>
-The solid state relay is wired to ground on pin 6, 5v on pin 2, and GPIO 7 on pin 7 by default<br><br>
+The solid state relay is wired to pin 6 (Ground), pin 2 (5v), and pin 7 (GPIO 7 by default) <br><br>
 
 Motion Sensor:<br>
 <a href="http://www.elecfreaks.com/wiki/index.php?title=PIR_Motion_Sensor_Module:DYP-ME003">PIR_Motion_Sensor_Module:DYP-ME003</a><br>
-The motion sensor wired up to GPIO3 (pin 15), 5v (pin 2), grd (pin 6)<br><br>
+The motion sensor wired up to pin 15 (GPIO3), pin 2 (5v), pin 6 (Ground)<br><br>
 
 Temperature/Humidity Sensor (DHT22):<br>
 <a href="ftp://imall.iteadstudio.com/Sensor/IM120712007/DS_IM120712007.pdf">DHT22</a><br>
