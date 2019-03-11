@@ -2,7 +2,6 @@ package com.bigboxer23.garage.services;
 
 import com.bigboxer23.garage.util.GPIOUtils;
 import com.pi4j.io.gpio.*;
-import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -16,11 +15,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class GarageDoorStatusService extends BaseService
 {
-	/**
-	 * Pin to use for status
-	 */
-	private static final Pin kStatusPin = GPIOUtils.getPin(Integer.getInteger("GPIO.status.pin", 2));
-
 	/**
 	 * Time to wait before closing
 	 */
@@ -44,12 +38,15 @@ public class GarageDoorStatusService extends BaseService
 	/**
 	 * Pin to get our status from
 	 */
-	private GpioPinDigitalInput myStatusPin;
+	private GpioPinDigitalInput myGarageDoorPin;
+
+	private GpioPinDigitalInput myHouseDoorPin;
+
 
 	public GarageDoorStatusService()
 	{
 		GpioController aGPIOFactory = GpioFactory.getInstance();
-		myStatusPin = aGPIOFactory.provisionDigitalInputPin(kStatusPin, PinPullResistance.PULL_DOWN);
+		myGarageDoorPin = aGPIOFactory.provisionDigitalInputPin(GPIOUtils.getPin(Integer.getInteger("GPIO.status.pin", 2)), PinPullResistance.PULL_DOWN);
 		/*
 		 * Listen for status changes.  These can apparently trigger multiple times even
 		 * when the status isn't really changing, so we use the open time as our gauge for "last"
@@ -58,7 +55,7 @@ public class GarageDoorStatusService extends BaseService
 		 *
 		 * @param theEvent
 		 */
-		myStatusPin.addListener((GpioPinListenerDigital) theEvent ->
+		myGarageDoorPin.addListener((GpioPinListenerDigital) theEvent ->
 		{
 			if(isGarageDoorOpen() && myOpenTime < 0)
 			{
@@ -78,6 +75,21 @@ public class GarageDoorStatusService extends BaseService
 			myOpenTime = System.currentTimeMillis() + kAutoCloseDelay;
 		}
 		myLogger.info("GarageDoorStatusService Startup:" + (isGarageDoorOpen() ? "Garage Door Opened." : "Garage Door Closed."));
+		myHouseDoorPin = aGPIOFactory.provisionDigitalInputPin(GPIOUtils.getPin(Integer.getInteger("GPIO.status.house.pin", 6)), PinPullResistance.PULL_UP);
+		myHouseDoorPin.addListener((GpioPinListenerDigital) theEvent ->
+		{
+			if (isHouseDoorOpen())
+			{
+				myLogger.info("Garage House door opened");
+				myCommunicationService.houseDoorOpened();
+				//Maybe?: myActionService.openDoor();
+			}
+		});
+	}
+
+	private boolean isHouseDoorOpen()
+	{
+		return myHouseDoorPin.getState().isHigh();
 	}
 
 	public void resetOpenTime()
@@ -117,7 +129,7 @@ public class GarageDoorStatusService extends BaseService
 			return myTempState;
 		}
 		myChangingStateDelay = -1;
-		boolean anIsOpen = !myStatusPin.getState().isHigh();
+		boolean anIsOpen = !myGarageDoorPin.getState().isHigh();
 		myLogger.debug("Garage is " + (anIsOpen ? "Open" : "Closed"));
 		return anIsOpen;
 	}

@@ -10,8 +10,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class WeatherService extends BaseService
 {
-	private static final int kSensorPin = Integer.getInteger("GPIO.temp.pin", 10);
-
 	private DHT22Sensor mySensor;
 
 	private float myCachedTemperature = -1;
@@ -22,7 +20,7 @@ public class WeatherService extends BaseService
 
 	public WeatherService()
 	{
-		mySensor = new DHT22Sensor(kSensorPin);
+		mySensor = new DHT22Sensor(Integer.getInteger("GPIO.temp.pin", 10));
 	}
 
 	public float getTemperature()
