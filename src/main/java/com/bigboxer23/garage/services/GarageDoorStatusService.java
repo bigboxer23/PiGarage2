@@ -81,6 +81,7 @@ public class GarageDoorStatusService extends BaseService
 			if (isHouseDoorOpen())
 			{
 				myLogger.info("Garage House door opened");
+				myStatusService.resetOpenTime();
 				myCommunicationService.houseDoorOpened();
 				//Maybe?: myActionService.openDoor();
 			}

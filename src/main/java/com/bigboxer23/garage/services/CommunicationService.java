@@ -32,7 +32,6 @@ public class CommunicationService extends BaseService
 	{
 		myLogger.info("Sending Notification");
 		doAction(kNotificationUrl);
-		myLogger.info("Notification Sent");
 		doAction(kOpenUrl);
 	}
 
@@ -49,7 +48,7 @@ public class CommunicationService extends BaseService
 
 	public void houseDoorOpened()
 	{
-		myLogger.debug("House door opened");
+		myLogger.info("House door opened");
 		doAction(kHouseDoorUrl);
 	}
 

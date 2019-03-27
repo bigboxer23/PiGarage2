@@ -29,11 +29,11 @@ public class HttpClientUtils
 
 	public static String execute(HttpRequestBase theRequestBase)
 	{
-		myLogger.info("executing " + theRequestBase.getURI());
+		myLogger.debug("executing " + theRequestBase.getURI());
 		try (CloseableHttpResponse aResponse = HttpClientUtils.getInstance().execute(theRequestBase))
 		{
 			String aResponseString = new String(ByteStreams.toByteArray(aResponse.getEntity().getContent()), Charsets.UTF_8);
-			myLogger.info("executed " + theRequestBase.getURI());
+			myLogger.debug("executed " + theRequestBase.getURI());
 			return aResponseString;
 		}
 		catch (IOException e)
@@ -80,6 +80,7 @@ public class HttpClientUtils
 							.setConnectTimeout(5000)
 							.setConnectionRequestTimeout(5000)
 							.setSocketTimeout(5000).build())
+					.evictExpiredConnections()
 					.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
 					.setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, (TrustStrategy) (arg0, arg1) -> true).build())
 					.build();
