@@ -30,8 +30,12 @@ public class CommunicationService extends BaseService
 
 	public void garageDoorOpened()
 	{
-		myLogger.info("Sending Notification");
-		doAction(kNotificationUrl);
+		myLogger.info("Potentially Sending Notification " + myStatusService.isHouseDoorRecentlyOpened());
+		//Don't trigger notification if house door was recently used, assuming someone inside the house is opening it
+		if (!myStatusService.isHouseDoorRecentlyOpened())
+		{
+			doAction(kNotificationUrl);
+		}
 		doAction(kOpenUrl);
 	}
 
