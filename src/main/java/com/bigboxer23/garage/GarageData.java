@@ -19,12 +19,16 @@ public class GarageData
 	@SerializedName("autoClose")
 	private long myAutoClose;
 
-	public GarageData(float theTemperature, float theHumidity, boolean theIsOpen, long theAutoClose)
+	@SerializedName("houseDoor")
+	private long myLastHouseDoorOpen;
+
+	public GarageData(float theTemperature, float theHumidity, boolean theIsOpen, long theAutoClose, long theLastHouseDoorOpen)
 	{
 		myTemperature = theTemperature;
 		myHumidity = theHumidity;
 		myIsOpen = theIsOpen;
 		myAutoClose = theAutoClose;
+		myLastHouseDoorOpen = theLastHouseDoorOpen;
 	}
 
 	public void setAutoClose(long theAutoClose)

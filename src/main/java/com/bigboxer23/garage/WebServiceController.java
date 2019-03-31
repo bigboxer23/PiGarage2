@@ -33,7 +33,8 @@ public class WebServiceController extends BaseService
 		return new GarageData(myWeatherService.getTemperature(),
 				myWeatherService.getHumidity(),
 				myStatusService.isGarageDoorOpen(),
-				myStatusService.getAutoCloseTimeRemaining());
+				myStatusService.getAutoCloseTimeRemaining(),
+				myStatusService.getLastHouseDoorOpen());
 	}
 
 	@RequestMapping("/Close")

@@ -104,6 +104,11 @@ public class GarageDoorStatusService extends BaseService
 		return System.currentTimeMillis() - myLastOpenHouseDoor >= 5000;
 	}
 
+	public long getLastHouseDoorOpen()
+	{
+		return myLastOpenHouseDoor;
+	}
+
 	public void resetGarageDoorOpenTime()
 	{
 		if(isGarageDoorOpen() && myOpenTime > 0 && (myOpenTime - System.currentTimeMillis()) < kAutoCloseDelay)
