@@ -3,7 +3,7 @@ package com.bigboxer23.garage;
 import com.bigboxer23.garage.services.BaseService;
 import com.google.gson.Gson;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.bigboxer23.garage.services.GarageDoorStatusService.kAutoCloseDelay;
@@ -21,7 +21,7 @@ public class WebServiceController extends BaseService
 	 *
 	 * @return
 	 */
-	@RequestMapping("/Status2")
+	@GetMapping(path = "/Status2", produces = "application/json;charset=UTF-8")
 	public String getStatus()
 	{
 		myLogger.debug("Checking status requested");
@@ -37,7 +37,7 @@ public class WebServiceController extends BaseService
 				myStatusService.getLastHouseDoorOpen());
 	}
 
-	@RequestMapping("/Close")
+	@GetMapping(path = "/Close", produces = "application/json;charset=UTF-8")
 	public String close()
 	{
 		myLogger.info("Closing door requested");
@@ -48,7 +48,7 @@ public class WebServiceController extends BaseService
 		return new Gson().toJson(aData);
 	}
 
-	@RequestMapping("/Open")
+	@GetMapping(path = "/Open", produces = "application/json;charset=UTF-8")
 	public String open()
 	{
 		myLogger.info("Opening door requested");
@@ -59,7 +59,7 @@ public class WebServiceController extends BaseService
 		return new Gson().toJson(aData);
 	}
 
-	@RequestMapping("/DisableAutoClose")
+	@GetMapping(path = "/DisableAutoClose", produces = "application/json;charset=UTF-8")
 	public String disableAutoClose()
 	{
 		if (myStatusService.isGarageDoorOpen())
