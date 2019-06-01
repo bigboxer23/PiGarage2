@@ -28,6 +28,9 @@ public class CommunicationService extends BaseService
 	@Value("${GarageHouseDoorUrl}")
 	private String kHouseDoorUrl;
 
+	@Value("$GarageCloseWarningUrl")
+	private String kGarageCloseWarningUrl;
+
 	public void garageDoorOpened()
 	{
 		myLogger.info("Potentially Sending Notification " + myStatusService.isHouseDoorRecentlyOpened());
@@ -37,6 +40,12 @@ public class CommunicationService extends BaseService
 			doAction(kNotificationUrl);
 		}
 		doAction(kOpenUrl);
+	}
+
+	public void garageDoorClosing()
+	{
+		myLogger.debug("garageDoorClosing");
+		doAction(kGarageCloseWarningUrl);
 	}
 
 	public void garageDoorClosed()

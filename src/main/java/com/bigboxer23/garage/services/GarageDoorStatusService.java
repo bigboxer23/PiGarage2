@@ -167,6 +167,10 @@ public class GarageDoorStatusService extends BaseService
 	public void iterate()
 	{
 		myLogger.debug("open time: " + myOpenTime + " current: " + System.currentTimeMillis() + " check: " + (System.currentTimeMillis() - myOpenTime));
+		if (myOpenTime > 0 && (System.currentTimeMillis() - myOpenTime - 30000) > 0)
+		{
+			myCommunicationService.garageDoorClosing();
+		}
 		if(myOpenTime > 0 && (System.currentTimeMillis() - myOpenTime) > 0)
 		{
 			myLogger.info("Garage has been open too long, closing.");
