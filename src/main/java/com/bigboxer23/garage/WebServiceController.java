@@ -3,8 +3,7 @@ package com.bigboxer23.garage;
 import com.bigboxer23.garage.services.BaseService;
 import com.google.gson.Gson;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static com.bigboxer23.garage.services.GarageDoorStatusService.kAutoCloseDelay;
 
@@ -59,15 +58,19 @@ public class WebServiceController extends BaseService
 		return new Gson().toJson(aData);
 	}
 
+	@GetMapping(path = "/SetAutoCloseDelay/{delay}", produces = "application/json;charset=UTF-8")
+	public String setAutoCloseDelay(@PathVariable(value = "delay") Long theDelay)
+	{
+		myLogger.info("set auto close requested: " + theDelay);
+		myStatusService.setAutoCloseDelay(theDelay);
+		return new Gson().toJson(getGarageData());
+	}
+
 	@GetMapping(path = "/DisableAutoClose", produces = "application/json;charset=UTF-8")
 	public String disableAutoClose()
 	{
-		if (myStatusService.isGarageDoorOpen())
-		{
-			myStatusService.disableAutoClose();
-		}
-		GarageData aData = getGarageData();
-		aData.setAutoClose(myStatusService.getAutoCloseTimeRemaining());
-		return new Gson().toJson(aData);
+		myLogger.info("disabling auto close requested.");
+		myStatusService.disableAutoClose();
+		return new Gson().toJson(getGarageData());
 	}
 }

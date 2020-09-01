@@ -20,6 +20,8 @@ public class GarageDoorStatusService extends BaseService
 	 */
 	public static final long kAutoCloseDelay = Integer.getInteger("close.delay", 1000 * 60 * 10);//ms * seconds * minutes -> 10 Minutes
 
+	private static final long kDisableAutoCloseDelay = 1000 * 60 * 60 * 3;
+
 	/**
 	 * Last time the door was detected open
 	 */
@@ -125,7 +127,7 @@ public class GarageDoorStatusService extends BaseService
 	 */
 	public long getAutoCloseTimeRemaining()
 	{
-		return myOpenTime > 0 ? (myOpenTime - System.currentTimeMillis()) : 0;
+		return Math.max(0, myOpenTime - System.currentTimeMillis());
 	}
 
 	/**
@@ -151,13 +153,21 @@ public class GarageDoorStatusService extends BaseService
 		return anIsOpen;
 	}
 
+	public void setAutoCloseDelay(long theOpenTime)
+	{
+		if (isGarageDoorOpen())
+		{
+			myLogger.info("setting auto close delay " + theOpenTime);
+			myOpenTime = System.currentTimeMillis() + theOpenTime;
+		}
+	}
+
 	/**
 	 * Set the auto close time forward 10x the normal wait, so won't close for a long while
 	 */
 	public void disableAutoClose()
 	{
-		myLogger.info("disabling auto close.");
-		myOpenTime = System.currentTimeMillis() + (10 * kAutoCloseDelay);
+		setAutoCloseDelay(myOpenTime + kDisableAutoCloseDelay);
 	}
 
 	/**
