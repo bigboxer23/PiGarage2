@@ -3,6 +3,7 @@ package com.bigboxer23.garage.services;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * wrap get/set of controller
@@ -22,31 +23,31 @@ public abstract class BaseService
 	protected CommunicationService myCommunicationService;
 
 	@Autowired
-	public void setMotionService(GarageDoorMotionService theMotionService)
+	public void setMotionService(@Lazy GarageDoorMotionService theMotionService)
 	{
 		myMotionService = theMotionService;
 	}
 
 	@Autowired
-	public void setStatusService(GarageDoorStatusService theStatusService)
+	public void setStatusService(@Lazy GarageDoorStatusService theStatusService)
 	{
 		myStatusService = theStatusService;
 	}
 
 	@Autowired
-	public void setActionService(GarageDoorActionService theActionService)
+	public void setActionService(@Lazy GarageDoorActionService theActionService)
 	{
 		myActionService = theActionService;
 	}
 
 	@Autowired
-	public void setWeatherService(WeatherService theWeatherService)
+	public void setWeatherService(@Lazy WeatherService theWeatherService)
 	{
 		myWeatherService = theWeatherService;
 	}
 
 	@Autowired
-	public void setCommunicationService(CommunicationService theCommunicationService)
+	public void setCommunicationService(@Lazy CommunicationService theCommunicationService)
 	{
 		myCommunicationService = theCommunicationService;
 	}
