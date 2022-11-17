@@ -1,44 +1,37 @@
 package com.bigboxer23.garage;
 
-import com.google.gson.annotations.SerializedName;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 
 /**
  *
  */
+@Data
+@Schema(description = "JSON representing garage's status")
 public class GarageData
 {
-	@SerializedName("temperature")
-	private float myTemperature;
+	@Schema(description = "temperature in the garage", required = true)
+	private float temperature;
 
-	@SerializedName("humidity")
-	private float myHumidity;
+	@Schema(description = "humidity in the garage", required = true)
+	private float humidity;
 
-	@SerializedName("door")
-	private boolean myIsOpen;
+	@Schema(description = "is the garage open (\"true\") or closed (\"false\")", required = true)
+	private String status;
 
-	@SerializedName("autoClose")
-	private long myAutoClose;
+	@Schema(description = "time in ms until the garage automatically closes", required = true)
+	private long autoClose;
 
-	@SerializedName("houseDoor")
-	private long myLastHouseDoorOpen;
+	@Schema(description = "time in ms when the house connected door was last opened", required = true)
+	private String level;
 
 	public GarageData(float theTemperature, float theHumidity, boolean theIsOpen, long theAutoClose, long theLastHouseDoorOpen)
 	{
-		myTemperature = theTemperature;
-		myHumidity = theHumidity;
-		myIsOpen = theIsOpen;
-		myAutoClose = theAutoClose;
-		myLastHouseDoorOpen = theLastHouseDoorOpen;
-	}
-
-	public void setAutoClose(long theAutoClose)
-	{
-		myAutoClose = theAutoClose;
-	}
-
-	public void setOpen(boolean theOpen)
-	{
-		myIsOpen = theOpen;
+		temperature = theTemperature;
+		humidity = theHumidity;
+		status = theIsOpen + "";
+		autoClose = theAutoClose;
+		level = theLastHouseDoorOpen + "";
 	}
 }
 

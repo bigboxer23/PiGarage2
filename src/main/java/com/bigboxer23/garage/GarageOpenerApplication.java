@@ -1,5 +1,8 @@
 package com.bigboxer23.garage;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +17,11 @@ import java.util.concurrent.ThreadFactory;
 
 @SpringBootApplication
 @EnableScheduling
+@OpenAPIDefinition(info =
+@Info(title = "Garage Opener", version = "1", description = "Allows rPi to control a garage door, including returning status about" +
+		" open/close state, when last opened, when house door was opened, temp, & humidity",
+		contact = @Contact(name = "bigboxer23@gmail.com", url="https://github.com/bigboxer23/PiGarage2"))
+)
 public class GarageOpenerApplication implements SchedulingConfigurer
 {
 	public static void main(String[] args)

@@ -1,8 +1,11 @@
 package com.bigboxer23.garage;
 
 import com.bigboxer23.garage.services.BaseService;
-import com.google.gson.Gson;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import static com.bigboxer23.garage.services.GarageDoorStatusService.kAutoCloseDelay;
@@ -13,6 +16,7 @@ import static com.bigboxer23.garage.services.GarageDoorStatusService.kAutoCloseD
  */
 @RestController
 @EnableAutoConfiguration
+@Tag(name = "Garage Controller", description = "Service to control the garage door pi")
 public class WebServiceController extends BaseService
 {
 	/**
@@ -20,11 +24,14 @@ public class WebServiceController extends BaseService
 	 *
 	 * @return
 	 */
-	@GetMapping(path = "/Status2", produces = "application/json;charset=UTF-8")
-	public String getStatus()
+	@GetMapping(value = "/Status2",
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(summary = "Get status about the garage",
+			description = "Gets various statuses associated with the garage's current state (temp, humidity, state, autoclose, etc)")
+	public GarageData getStatus()
 	{
 		myLogger.debug("Checking status requested");
-		return new Gson().toJson(getGarageData());
+		return getGarageData();
 	}
 
 	private GarageData getGarageData()
@@ -36,41 +43,55 @@ public class WebServiceController extends BaseService
 				myStatusService.getLastHouseDoorOpen());
 	}
 
-	@GetMapping(path = "/Close", produces = "application/json;charset=UTF-8")
-	public String close()
+	@GetMapping(value = "/Close",
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(summary = "close the garage",
+			description = "If open, this endpoint will trigger garage closing")
+	public GarageData close()
 	{
 		myLogger.info("Closing door requested");
 		myActionService.closeDoor();
+		myStatusService.setAutoCloseDelay(-1);
 		GarageData aData = getGarageData();
-		aData.setAutoClose(-1);
-		aData.setOpen(false);
-		return new Gson().toJson(aData);
+		aData.setStatus("false");
+		return aData;
 	}
 
-	@GetMapping(path = "/Open", produces = "application/json;charset=UTF-8")
-	public String open()
+	@GetMapping(value = "/Open",
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(summary = "open the garage",
+			description = "If closed, this endpoint will trigger garage opening")
+	public GarageData open()
 	{
 		myLogger.info("Opening door requested");
 		myActionService.openDoor();
 		GarageData aData = getGarageData();
 		aData.setAutoClose(kAutoCloseDelay);
-		aData.setOpen(true);
-		return new Gson().toJson(aData);
+		aData.setStatus("true");
+		return aData;
 	}
 
-	@GetMapping(path = "/SetAutoCloseDelay/{delay}", produces = "application/json;charset=UTF-8")
-	public String setAutoCloseDelay(@PathVariable(value = "delay") Long theDelay)
+	@GetMapping(value = "/SetAutoCloseDelay/{delay}",
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(summary = "disables auto close by some delay",
+			description = "Turns auto close off for delay defined by the path variable")
+	public GarageData setAutoCloseDelay(@Parameter(description = "how long to delay auto close, in ms")
+	                                    @PathVariable(value = "delay")
+	                                    Long delay)
 	{
-		myLogger.info("set auto close requested: " + theDelay);
-		myStatusService.setAutoCloseDelay(theDelay);
-		return new Gson().toJson(getGarageData());
+		myLogger.info("set auto close requested: " + delay);
+		myStatusService.setAutoCloseDelay(delay);
+		return getGarageData();
 	}
 
-	@GetMapping(path = "/DisableAutoClose", produces = "application/json;charset=UTF-8")
-	public String disableAutoClose()
+	@GetMapping(value = "/DisableAutoClose",
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(summary = "disables auto close of the garage by 3 hours",
+			description = "Turns auto close off for the next three hours")
+	public GarageData disableAutoClose()
 	{
 		myLogger.info("disabling auto close requested.");
 		myStatusService.disableAutoClose();
-		return new Gson().toJson(getGarageData());
+		return getGarageData();
 	}
 }
