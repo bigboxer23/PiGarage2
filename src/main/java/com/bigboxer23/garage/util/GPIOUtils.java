@@ -3,22 +3,17 @@ package com.bigboxer23.garage.util;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.RaspiPin;
 
-/**
- *
- */
-public class GPIOUtils
-{
+/** */
+public class GPIOUtils {
 	/**
 	 * Get a GPIO pin from an integer
 	 *
 	 * @param theStatusPin integer representation of the pin
 	 * @return
 	 */
-	public static Pin getPin(int theStatusPin)
-	{
+	public static Pin getPin(int theStatusPin) {
 		Pin aPin = RaspiPin.GPIO_02;
-		switch (theStatusPin)
-		{
+		switch (theStatusPin) {
 			case 0:
 				aPin = RaspiPin.GPIO_00;
 				break;

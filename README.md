@@ -1,17 +1,19 @@
 PiGarage 2.1
-========
+============
 
 Updated from version one to use springboot to allow easy configuration of HTTPS and maven.
 
-To add HTTPS support, create a file named application.properties and place into the src/resources directory.  Example 
+To add HTTPS support, create a file named application.properties and place into the src/resources directory.  Example
 file contents would be something like:
+
 ```
 server.port: 443
 server.ssl.key-store: keystore.p12
 server.ssl.key-store-password: mySecurePassword
 server.ssl.keyStoreType: PKCS12
 ```
-To generate a self signed certificate for development, the following command can be used: 
+
+To generate a self signed certificate for development, the following command can be used:
 keytool -genkey -alias tomcat -storetype PKCS12 -keyalg RSA -keysize 2048 -keystore keystore.p12 -validity 3650
 
 Good resource for setting this up: https://drissamri.be/blog/java/enable-https-in-spring-boot/
@@ -53,8 +55,6 @@ cd Adafruit-Raspberry-Pi-Python-Code/Adafruit_DHT_Driver<br>
 sudo cp Adafruit_DHT /usr/bin<br>
 <br><br>
 
-
-
 There are multiple configurable properties that can be set at runtime:<br>
 log.location: Path to the file to log information about opener status, actions, etc.<br>
 status.path: URL to get status from (default is "/Status2")<br>
@@ -71,20 +71,22 @@ GPIO.status.house.pin: Pin to use for the garage house door (default is WiringPi
 Example `application.properties`
 
 ```server.port: 443
-   server.ssl.key-store: keystore.p12
-   server.ssl.key-store-password: mysupersecretpw
-   server.ssl.keyStoreType: PKCS12
-   GarageOpenUrl=https://myHub/S/OpenHAB/GarageOpen/100
-   GarageCloseUrl=ttps://myHub/S/OpenHAB/GarageClosed/100
-   GarageMotionUrl=https://myHub/S/OpenHAB/GarageLights/100
-   GarageHouseDoorUrl=https://myHub/S/OpenHAB/GarageLights/100
-   GarageNotificationUrl=https:/myHub/S/Notification
-   logbackserver=192.168.0.234:5671
-   ```
+server.ssl.key-store: keystore.p12
+server.ssl.key-store-password: mysupersecretpw
+server.ssl.keyStoreType: PKCS12
+GarageOpenUrl=https://myHub/S/OpenHAB/GarageOpen/100
+GarageCloseUrl=ttps://myHub/S/OpenHAB/GarageClosed/100
+GarageMotionUrl=https://myHub/S/OpenHAB/GarageLights/100
+GarageHouseDoorUrl=https://myHub/S/OpenHAB/GarageLights/100
+GarageNotificationUrl=https:/myHub/S/Notification
+logbackserver=192.168.0.234:5671
+```
 
 Setup on pi:
 Add the folowing to `/etc/rc.local` to launch on startup
 
 ```cd /home/pi
 sudo nohup java -jar /home/pi/com/bigboxer23/garageOpener/1.0.0/garageOpener-1.0.0.jar
-exit 0```
+exit 0
+```
+

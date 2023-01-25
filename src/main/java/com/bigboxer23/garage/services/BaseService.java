@@ -5,11 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
-/**
- * wrap get/set of controller
- */
-public abstract class BaseService
-{
+/** wrap get/set of controller */
+public abstract class BaseService {
 	protected static final Logger myLogger = LoggerFactory.getLogger(BaseService.class);
 
 	protected GarageDoorMotionService myMotionService;
@@ -23,32 +20,27 @@ public abstract class BaseService
 	protected CommunicationService myCommunicationService;
 
 	@Autowired
-	public void setMotionService(@Lazy GarageDoorMotionService theMotionService)
-	{
+	public void setMotionService(@Lazy GarageDoorMotionService theMotionService) {
 		myMotionService = theMotionService;
 	}
 
 	@Autowired
-	public void setStatusService(@Lazy GarageDoorStatusService theStatusService)
-	{
+	public void setStatusService(@Lazy GarageDoorStatusService theStatusService) {
 		myStatusService = theStatusService;
 	}
 
 	@Autowired
-	public void setActionService(@Lazy GarageDoorActionService theActionService)
-	{
+	public void setActionService(@Lazy GarageDoorActionService theActionService) {
 		myActionService = theActionService;
 	}
 
 	@Autowired
-	public void setWeatherService(@Lazy WeatherService theWeatherService)
-	{
+	public void setWeatherService(@Lazy WeatherService theWeatherService) {
 		myWeatherService = theWeatherService;
 	}
 
 	@Autowired
-	public void setCommunicationService(@Lazy CommunicationService theCommunicationService)
-	{
+	public void setCommunicationService(@Lazy CommunicationService theCommunicationService) {
 		myCommunicationService = theCommunicationService;
 	}
 }
