@@ -1,3 +1,5 @@
+[![CodeQL](https://github.com/bigboxer23/PiGarage2/actions/workflows/codeql.yml/badge.svg)](https://github.com/bigboxer23/PiGarage2/actions/workflows/codeql.yml)
+
 PiGarage 2.1
 ============
 
