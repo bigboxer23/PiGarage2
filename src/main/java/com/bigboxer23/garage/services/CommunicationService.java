@@ -1,7 +1,7 @@
 package com.bigboxer23.garage.services;
 
-import com.bigboxer23.utils.http.HttpClientUtils;
-import org.apache.http.client.methods.HttpGet;
+import com.bigboxer23.utils.http.OkHttpUtil;
+import java.io.IOException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -62,6 +62,10 @@ public class CommunicationService extends BaseService {
 		if (theUrl == null || theUrl.length() == 0) {
 			return;
 		}
-		HttpClientUtils.execute(new HttpGet(theUrl));
+		try {
+			OkHttpUtil.getSynchronous(theUrl, null);
+		} catch (IOException e) {
+			myLogger.warn("error doing action: " + theUrl, e);
+		}
 	}
 }
