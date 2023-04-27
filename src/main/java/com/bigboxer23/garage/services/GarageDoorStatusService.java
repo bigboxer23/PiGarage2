@@ -1,6 +1,8 @@
 package com.bigboxer23.garage.services;
 
 import com.bigboxer23.garage.util.GPIOUtils;
+import com.bigboxer23.garage.util.GpioPinDigitalFactory;
+import com.bigboxer23.garage.util.GpioPinDigitalInputFacade;
 import com.pi4j.io.gpio.*;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -30,16 +32,16 @@ public class GarageDoorStatusService extends BaseService {
 	private boolean myTempState = false;
 
 	/** Pin to get our status from */
-	private GpioPinDigitalInput myGarageDoorPin;
+	private GpioPinDigitalInputFacade myGarageDoorPin;
 
-	private GpioPinDigitalInput myHouseDoorPin;
+	private GpioPinDigitalInputFacade myHouseDoorPin;
 
 	private long myLastOpenHouseDoor = System.currentTimeMillis();
 
 	public GarageDoorStatusService() {
-		GpioController aGPIOFactory = GpioFactory.getInstance();
-		myGarageDoorPin = aGPIOFactory.provisionDigitalInputPin(
-				GPIOUtils.getPin(Integer.getInteger("GPIO.status.pin", 2)), PinPullResistance.PULL_DOWN);
+		myGarageDoorPin = GpioPinDigitalFactory.getInstance()
+				.provisionDigitalInputPin(
+						GPIOUtils.getPin(Integer.getInteger("GPIO.status.pin", 2)), PinPullResistance.PULL_DOWN);
 		/*
 		 * Listen for status changes.  These can apparently trigger multiple times even
 		 * when the status isn't really changing, so we use the open time as our gauge for "last"
@@ -65,8 +67,9 @@ public class GarageDoorStatusService extends BaseService {
 		}
 		myLogger.info("GarageDoorStatusService Startup:"
 				+ (isGarageDoorOpen() ? "Garage Door Opened." : "Garage Door Closed."));
-		myHouseDoorPin = aGPIOFactory.provisionDigitalInputPin(
-				GPIOUtils.getPin(Integer.getInteger("GPIO.status.house.pin", 6)), PinPullResistance.PULL_UP);
+		myHouseDoorPin = GpioPinDigitalFactory.getInstance()
+				.provisionDigitalInputPin(
+						GPIOUtils.getPin(Integer.getInteger("GPIO.status.house.pin", 6)), PinPullResistance.PULL_UP);
 		myHouseDoorPin.addListener((GpioPinListenerDigital) theEvent -> {
 			if (isHouseDoorOpen()) {
 				myLastOpenHouseDoor = System.currentTimeMillis();
@@ -78,7 +81,7 @@ public class GarageDoorStatusService extends BaseService {
 	}
 
 	private boolean isHouseDoorOpen() {
-		return myHouseDoorPin.getState().isHigh();
+		return myHouseDoorPin.isHigh();
 	}
 
 	/**
@@ -130,7 +133,7 @@ public class GarageDoorStatusService extends BaseService {
 			return myTempState;
 		}
 		myChangingStateDelay = -1;
-		boolean anIsOpen = !myGarageDoorPin.getState().isHigh();
+		boolean anIsOpen = !myGarageDoorPin.isHigh();
 		myLogger.debug("Garage is " + (anIsOpen ? "Open" : "Closed"));
 		return anIsOpen;
 	}
