@@ -1,6 +1,8 @@
 package com.bigboxer23.garage.services;
 
 import com.bigboxer23.garage.util.GPIOUtils;
+import com.bigboxer23.garage.util.GpioPinDigitalFactory;
+import com.bigboxer23.garage.util.GpioPinDigitalOutputFacade;
 import com.pi4j.io.gpio.*;
 import org.springframework.stereotype.Component;
 
@@ -10,16 +12,14 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class GarageDoorActionService extends BaseService {
-	private GpioPinDigitalOutput myPinTrigger;
-
-	/** Pin to use for triggering actions */
-	private static final Pin kActionPin = GPIOUtils.getPin(Integer.getInteger("GPIO.action.pin", 7));
+	private final GpioPinDigitalOutputFacade pinTrigger;
 
 	/** The delay between the "press" and the "let go" */
 	public static final int kTriggerDelay = Integer.getInteger("triggerDelay", 400);
 
 	public GarageDoorActionService() {
-		myPinTrigger = GpioFactory.getInstance().provisionDigitalOutputPin(kActionPin, "MyActionPin", PinState.HIGH);
+		pinTrigger = GpioPinDigitalFactory.getInstance()
+				.provisionDigitalOutputPin(GPIOUtils.getPin(Integer.getInteger("GPIO.action.pin", 7)), PinState.HIGH);
 	}
 
 	/** Close the door if it is open */
@@ -43,11 +43,11 @@ public class GarageDoorActionService extends BaseService {
 	 */
 	private void doDoorAction() {
 		myStatusService.changingState();
-		myPinTrigger.low();
+		pinTrigger.low();
 		try {
 			Thread.sleep(kTriggerDelay);
 		} catch (InterruptedException e) {
 		}
-		myPinTrigger.high();
+		pinTrigger.high();
 	}
 }
