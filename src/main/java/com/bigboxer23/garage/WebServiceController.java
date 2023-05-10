@@ -36,7 +36,8 @@ public class WebServiceController extends BaseService {
 				myWeatherService.getHumidity(),
 				myStatusService.isGarageDoorOpen(),
 				myStatusService.getAutoCloseTimeRemaining(),
-				myStatusService.getLastHouseDoorOpen());
+				myStatusService.getLastHouseDoorOpen(),
+				myStatusService.getHistoricOpenTime());
 	}
 
 	@GetMapping(value = "/Close", produces = MediaType.APPLICATION_JSON_VALUE)

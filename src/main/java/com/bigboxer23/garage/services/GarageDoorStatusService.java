@@ -4,7 +4,6 @@ import com.bigboxer23.garage.util.GPIOUtils;
 import com.bigboxer23.garage.util.GpioPinDigitalFactory;
 import com.bigboxer23.garage.util.GpioPinDigitalInputFacade;
 import com.pi4j.io.gpio.*;
-import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -38,6 +37,8 @@ public class GarageDoorStatusService extends BaseService {
 
 	private long myLastOpenHouseDoor = System.currentTimeMillis();
 
+	private long historicOpenTime = -1;
+
 	public GarageDoorStatusService() {
 		myGarageDoorPin = GpioPinDigitalFactory.getInstance()
 				.provisionDigitalInputPin(
@@ -50,9 +51,10 @@ public class GarageDoorStatusService extends BaseService {
 		 *
 		 * @param theEvent
 		 */
-		myGarageDoorPin.addListener((GpioPinListenerDigital) theEvent -> {
+		myGarageDoorPin.addListener(theEvent -> {
 			if (isGarageDoorOpen() && myOpenTime < 0) {
 				myOpenTime = System.currentTimeMillis() + kAutoCloseDelay;
+				historicOpenTime = System.currentTimeMillis();
 				myLogger.info("Garage Door Opened.");
 				myCommunicationService.garageDoorOpened();
 			}
@@ -64,13 +66,14 @@ public class GarageDoorStatusService extends BaseService {
 		});
 		if (isGarageDoorOpen()) {
 			myOpenTime = System.currentTimeMillis() + kAutoCloseDelay;
+			historicOpenTime = System.currentTimeMillis();
 		}
 		myLogger.info("GarageDoorStatusService Startup:"
 				+ (isGarageDoorOpen() ? "Garage Door Opened." : "Garage Door Closed."));
 		myHouseDoorPin = GpioPinDigitalFactory.getInstance()
 				.provisionDigitalInputPin(
 						GPIOUtils.getPin(Integer.getInteger("GPIO.status.house.pin", 6)), PinPullResistance.PULL_UP);
-		myHouseDoorPin.addListener((GpioPinListenerDigital) theEvent -> {
+		myHouseDoorPin.addListener(theEvent -> {
 			if (isHouseDoorOpen()) {
 				myLastOpenHouseDoor = System.currentTimeMillis();
 				resetGarageDoorOpenTime();
@@ -174,5 +177,9 @@ public class GarageDoorStatusService extends BaseService {
 			myOpenTime = System.currentTimeMillis() + kAutoCloseDelay;
 			myActionService.closeDoor();
 		}
+	}
+
+	public long getHistoricOpenTime() {
+		return historicOpenTime;
 	}
 }
