@@ -22,12 +22,21 @@ public class GarageData {
 	@Schema(description = "time in ms when the house connected door was last opened", required = true)
 	private String level;
 
+	@Schema(description = "When was the last time the garage door was opened", required = true)
+	private long historicOpenTime;
+
 	public GarageData(
-			float theTemperature, float theHumidity, boolean theIsOpen, long theAutoClose, long theLastHouseDoorOpen) {
+			float theTemperature,
+			float theHumidity,
+			boolean theIsOpen,
+			long theAutoClose,
+			long theLastHouseDoorOpen,
+			long historicOpenTime) {
 		temperature = theTemperature;
 		humidity = theHumidity;
 		status = theIsOpen + "";
 		autoClose = theAutoClose;
 		level = theLastHouseDoorOpen + "";
+		this.historicOpenTime = historicOpenTime;
 	}
 }
