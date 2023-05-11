@@ -25,7 +25,7 @@ public class GarageDoorActionService extends BaseService {
 	/** Close the door if it is open */
 	public void closeDoor() {
 		if (myStatusService.isGarageDoorOpen()) {
-			myLogger.debug("Closing the door.");
+			logger.debug("Closing the door.");
 			doDoorAction();
 		}
 	}
@@ -33,7 +33,7 @@ public class GarageDoorActionService extends BaseService {
 	/** Open the door if it is already closed */
 	public void openDoor() {
 		if (!myStatusService.isGarageDoorOpen()) {
-			myLogger.debug("Opening the door.");
+			logger.debug("Opening the door.");
 			doDoorAction();
 		}
 	}

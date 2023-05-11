@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Lazy;
 
 /** wrap get/set of controller */
 public abstract class BaseService {
-	protected static final Logger myLogger = LoggerFactory.getLogger(BaseService.class);
+	protected static final Logger logger = LoggerFactory.getLogger(BaseService.class);
 
 	protected GarageDoorMotionService myMotionService;
 

@@ -33,12 +33,12 @@ public class GarageDoorMotionService extends BaseService {
 		 */
 		statusPin.addListener(theEvent -> {
 			if (isMotionDetected() && (myLastTime == -1 || System.currentTimeMillis() - myLastTime > kDelay)) {
-				myLogger.debug("Motion detected, within debounce time, ignoring.");
+				logger.debug("Motion detected, within debounce time, ignoring.");
 				myLastTime = System.currentTimeMillis();
 				return;
 			}
 			myLastTime = -1;
-			myLogger.info("Motion detected.");
+			logger.info("Motion detected.");
 			myStatusService.resetGarageDoorOpenTime();
 			myCommunicationService.motionDetected();
 		});

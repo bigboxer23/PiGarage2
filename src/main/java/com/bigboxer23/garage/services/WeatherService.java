@@ -20,18 +20,18 @@ public class WeatherService extends BaseService {
 	}
 
 	public float getTemperature() {
-		myLogger.debug("Last update: " + myLastUpdate);
+		logger.debug("Last update: " + myLastUpdate);
 		return myCachedTemperature;
 	}
 
 	public float getHumidity() {
-		myLogger.debug("Last update: " + myLastUpdate);
+		logger.debug("Last update: " + myLastUpdate);
 		return myCachedHumidity;
 	}
 
 	@Scheduled(fixedRate = 5000)
 	private void refreshInformation() {
-		myLogger.debug("Getting new sensorData...");
+		logger.debug("Getting new sensorData...");
 		myCachedTemperature = mySensor.getTemperature();
 		myCachedHumidity = mySensor.getHumidity();
 		myLastUpdate = System.currentTimeMillis();
