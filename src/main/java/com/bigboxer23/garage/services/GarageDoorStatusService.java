@@ -55,7 +55,7 @@ public class GarageDoorStatusService extends BaseService {
 		 */
 		myGarageDoorPin.addListener(event -> {
 			if (lastGarageDoorEvent + 2000 > System.currentTimeMillis()) {
-				logger.warn("ignoring garage open/close event for debounce: "
+				logger.debug("ignoring garage open/close event for debounce: "
 						+ event.getState().isHigh()
 						+ " "
 						+ isGarageDoorOpen());
