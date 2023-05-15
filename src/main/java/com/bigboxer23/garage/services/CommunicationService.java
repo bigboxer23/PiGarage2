@@ -30,7 +30,7 @@ public class CommunicationService extends BaseService {
 	private String kGarageCloseWarningUrl;
 
 	public void garageDoorOpened() {
-		myLogger.info("Potentially Sending Notification " + myStatusService.isHouseDoorRecentlyOpened());
+		logger.info("Potentially Sending Notification " + myStatusService.isHouseDoorRecentlyOpened());
 		// Don't trigger notification if house door was recently used, assuming someone inside the
 		// house is opening it
 		if (!myStatusService.isHouseDoorRecentlyOpened()) {
@@ -40,7 +40,7 @@ public class CommunicationService extends BaseService {
 	}
 
 	public void garageDoorClosing() {
-		myLogger.debug("garageDoorClosing");
+		logger.debug("garageDoorClosing");
 		doAction(kGarageCloseWarningUrl);
 	}
 
@@ -49,12 +49,12 @@ public class CommunicationService extends BaseService {
 	}
 
 	public void motionDetected() {
-		myLogger.debug("informing motion url");
+		logger.debug("informing motion url");
 		doAction(kMotionUrl);
 	}
 
 	public void houseDoorOpened() {
-		myLogger.info("House door opened");
+		logger.info("House door opened");
 		doAction(kHouseDoorUrl);
 	}
 
@@ -65,7 +65,7 @@ public class CommunicationService extends BaseService {
 		try {
 			OkHttpUtil.getSynchronous(theUrl, null);
 		} catch (IOException e) {
-			myLogger.warn("error doing action: " + theUrl, e);
+			logger.warn("error doing action: " + theUrl, e);
 		}
 	}
 }

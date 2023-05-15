@@ -26,7 +26,7 @@ public class WebServiceController extends BaseService {
 			description = "Gets various statuses associated with the garage's current state (temp,"
 					+ " humidity, state, autoclose, etc)")
 	public GarageData getStatus() {
-		myLogger.debug("Checking status requested");
+		logger.debug("Checking status requested");
 		return getGarageData();
 	}
 
@@ -43,7 +43,7 @@ public class WebServiceController extends BaseService {
 	@GetMapping(value = "/Close", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(summary = "close the garage", description = "If open, this endpoint will trigger garage closing")
 	public GarageData close() {
-		myLogger.info("Closing door requested");
+		logger.info("Closing door requested");
 		myActionService.closeDoor();
 		myStatusService.setAutoCloseDelay(-1);
 		GarageData aData = getGarageData();
@@ -54,7 +54,7 @@ public class WebServiceController extends BaseService {
 	@GetMapping(value = "/Open", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(summary = "open the garage", description = "If closed, this endpoint will trigger garage opening")
 	public GarageData open() {
-		myLogger.info("Opening door requested");
+		logger.info("Opening door requested");
 		myActionService.openDoor();
 		GarageData aData = getGarageData();
 		aData.setAutoClose(kAutoCloseDelay);
@@ -68,7 +68,7 @@ public class WebServiceController extends BaseService {
 			description = "Turns auto close off for delay defined by the path variable")
 	public GarageData setAutoCloseDelay(
 			@Parameter(description = "how long to delay auto close, in ms") @PathVariable(value = "delay") Long delay) {
-		myLogger.info("set auto close requested: " + delay);
+		logger.info("set auto close requested: " + delay);
 		myStatusService.setAutoCloseDelay(delay);
 		return getGarageData();
 	}
@@ -78,7 +78,7 @@ public class WebServiceController extends BaseService {
 			summary = "disables auto close of the garage by 3 hours",
 			description = "Turns auto close off for the next three hours")
 	public GarageData disableAutoClose() {
-		myLogger.info("disabling auto close requested.");
+		logger.info("disabling auto close requested.");
 		myStatusService.disableAutoClose();
 		return getGarageData();
 	}
