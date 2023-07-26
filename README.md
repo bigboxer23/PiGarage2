@@ -1,7 +1,6 @@
 [![CodeQL](https://github.com/bigboxer23/PiGarage2/actions/workflows/codeql.yml/badge.svg)](https://github.com/bigboxer23/PiGarage2/actions/workflows/codeql.yml)
 
-PiGarage 2.1
-============
+# PiGarage 2.1
 
 Updated from version one to use springboot to allow easy configuration of HTTPS and maven.
 
@@ -30,33 +29,34 @@ Ties together these two projects:<br>
 <a href="http://www.instructables.com/id/Raspberry-Pi-Garage-Door-Opener/?ALLSTEPS">Magnetic Sensor</a><br>
 <a href="https://www.richlynch.com/2013/07/27/pi_garage_alert_1/">Opener</a><br><br>
 
-<h3>Wiring devices to the pi</h3>
-<h4>Sensor for garage door:</h4>
+### Wiring devices to the pi
+#### Sensor for garage door:
 	<a href="http://www.smarthome.com/7455/Seco-Larm-SM-226L-Garage-Door-Contacts-for-Closed-Circuits/p.aspx">Seco-Larm SM-226L</a><br>
 This is wired to <i>Pin 9 (Ground)</i> and <i>Pin 13 (GPIO 27, WiringPi 2)</i>.<br><br>
 
-<h4>Sensor for garage house door:</h4>
+#### Sensor for garage house door:
 <a href="https://www.amazon.com/gp/product/B07F314V3Z/ref=ppx_yo_dt_b_asin_title_o02_s00?ie=UTF8&psc=1">Magnetic Door Sensor</a><br>
 The motion sensor wired up to <i>pin 22 (GPIO 25, WiringPi 6)</i>, <i>pin 20 (Ground)</i><br><br>
 
-<h4>Solid State Relay:</h4>
+#### Solid State Relay:
 <a href="http://www.amazon.com/gp/product/B00E0NTPP4/ref=ox_ya_os_product_refresh_T1">Solid State Relay</a><br>
 The solid state relay is wired to <i>pin 6 (Ground)</i>, <i>pin 2 (5v)</i>, and <i>pin 7 (GPIO 4, WiringPi 7)</i> <br><br>
 
-<h4>Motion Sensor:</h4>
+#### Motion Sensor:
 <a href="http://www.elecfreaks.com/wiki/index.php?title=PIR_Motion_Sensor_Module:DYP-ME003">PIR_Motion_Sensor_Module:DYP-ME003</a><br>
 The motion sensor wired up to <i>pin 15 (GPIO 22, WiringPi 3)</i>, <i>pin 2 (5v)</i>, <i>pin 6 (Ground)</i><br><br>
 
-<h4>Temperature/Humidity Sensor (DHT22):</h4>
+#### Temperature/Humidity Sensor (DHT22):
 <a href="ftp://imall.iteadstudio.com/Sensor/IM120712007/DS_IM120712007.pdf">DHT22</a><br>
 The temperature/humidity sensor wired up to <i>pin 19 (GPIO 10)</i>, <i>pin 17 (3.3v)</i>, <i>pin 25 (ground)</i><br>
 Note:  This sensor requires the adafruit dht driver be installed in a path accessible location.<br>
 Example:<br>
-git clone git://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code.git<br>
+```git clone git://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code.git<br>
 cd Adafruit-Raspberry-Pi-Python-Code/Adafruit_DHT_Driver<br>
-sudo cp Adafruit_DHT /usr/bin<br>
-<br><br>
+sudo cp Adafruit_DHT /usr/bin
+```
 
+### Configurable Properties
 There are multiple configurable properties that can be set at runtime:<br>
 log.location: Path to the file to log information about opener status, actions, etc.<br>
 status.path: URL to get status from (default is "/Status2")<br>
@@ -70,8 +70,7 @@ GPIO.motion.pin: Pin to use for the motion sensor (default is WiringPi 3, pin 15
 GPIO.temp.pin: Pin to use for the temperature sensor (default is GPIO 10, pin 19)
 GPIO.status.house.pin: Pin to use for the garage house door (default is WiringPi 6, pin 22)
 
-Example `application.properties`
-
+### Example `application.properties`
 ```server.port: 443
 server.ssl.key-store: keystore.p12
 server.ssl.key-store-password: mysupersecretpw
@@ -84,11 +83,6 @@ GarageNotificationUrl=https:/myHub/S/Notification
 logbackserver=192.168.0.234:5671
 ```
 
-Setup on pi:
-Add the folowing to `/etc/rc.local` to launch on startup
-
-```cd /home/pi
-sudo nohup java -jar /home/pi/com/bigboxer23/garageOpener/1.0.0/garageOpener-1.0.0.jar
-exit 0
-```
+### Setup on pi:
+Edit and run the `scripts/install.sh`.  It will create a service definition which will launch the app automatically
 

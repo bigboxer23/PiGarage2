@@ -1,0 +1,9 @@
+[Unit]
+Description=start garage server on boot
+After=multi-user.target
+[Service]
+WorkingDirectory=/home/pi/
+ExecStart=java -jar /home/pi/com/bigboxer23/garageOpener/1.0.0/garageOpener-1.0.0.jar
+User=root
+[Install]
+WantedBy=multi-user.target
