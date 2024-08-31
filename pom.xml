@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.7.14</version>
+    <version>2.7.18</version>
     <relativePath/>
     <!-- lookup parent from repository -->
   </parent>
@@ -115,8 +115,15 @@
             <phase>package</phase>
             <configuration>
               <target>
-                <scp file="${project.basedir}/target/garageOpener-1.0.0.jar" keyfile="${user.home}/.ssh/id_rsa" passphrase="" todir="pi@${host}:/home/pi/com/bigboxer23/garageOpener/1.0.0" trust="true"/>
-                <sshexec command="sudo systemctl restart garage.service" host="${host}" keyfile="${user.home}/.ssh/id_rsa" trust="true" username="pi"/>
+                <exec executable="scp">
+                  <arg value="${project.basedir}/target/garageOpener-1.0.0.jar"/>
+                  <arg value="pi@${host}:/home/pi/com/bigboxer23/garageOpener/1.0.0"/>
+                </exec>
+                <exec executable="ssh">
+                  <arg value="-tt"/>
+                  <arg value="pi@${host}"/>
+                  <arg value="sudo systemctl restart garage.service"/>
+                </exec>
               </target>
             </configuration>
           </execution>
