@@ -187,6 +187,10 @@ public class GarageDoorStatusService extends BaseService {
 			myOpenTime = System.currentTimeMillis() + kAutoCloseDelay;
 			myActionService.closeDoor();
 		}
+		if (myOpenTime == -1 && isGarageDoorOpen()) {
+			logger.warn("Detected unset open time and open garage door, setting open time");
+			myOpenTime = System.currentTimeMillis() + kAutoCloseDelay;
+		}
 	}
 
 	public long getHistoricOpenTime() {
