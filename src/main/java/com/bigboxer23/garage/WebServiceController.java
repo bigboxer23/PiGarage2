@@ -62,6 +62,22 @@ public class WebServiceController extends BaseService {
 		return aData;
 	}
 
+	@GetMapping(value = "/ToggleOpenClosed", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Operation(
+			summary = "open or close the garage depending on current state",
+			description = "If closed, this endpoint will trigger garage opening and vice versa")
+	public GarageData toggleOpenClosed() {
+		GarageData data = getGarageData();
+		boolean isOpen = Boolean.parseBoolean(data.getStatus());
+		if (isOpen) {
+			myActionService.closeDoor();
+		} else {
+			myActionService.openDoor();
+		}
+		data.setStatus(String.valueOf(!isOpen));
+		return data;
+	}
+
 	@GetMapping(value = "/SetAutoCloseDelay/{delay}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(
 			summary = "disables auto close by some delay",
