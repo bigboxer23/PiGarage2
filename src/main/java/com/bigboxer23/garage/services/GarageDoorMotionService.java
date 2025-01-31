@@ -4,6 +4,7 @@ import com.bigboxer23.garage.util.GPIOUtils;
 import com.bigboxer23.garage.util.GpioPinDigitalFactory;
 import com.bigboxer23.garage.util.GpioPinDigitalInputFacade;
 import com.pi4j.io.gpio.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
  * motion) and tells the status service to reset its auto close timer (we're actively in the garage
  * working on something)
  */
+@Slf4j
 @Component
 public class GarageDoorMotionService extends BaseService {
 	/** Delay because the sensor bounces up and down so we don't want to reset a bunch of times */
@@ -33,12 +35,12 @@ public class GarageDoorMotionService extends BaseService {
 		 */
 		statusPin.addListener(theEvent -> {
 			if (isMotionDetected() && (myLastTime == -1 || System.currentTimeMillis() - myLastTime > kDelay)) {
-				logger.debug("Motion detected, within debounce time, ignoring.");
+				log.debug("Motion detected, within debounce time, ignoring.");
 				myLastTime = System.currentTimeMillis();
 				return;
 			}
 			myLastTime = -1;
-			logger.info("Motion detected.");
+			log.info("Motion detected.");
 			myStatusService.resetGarageDoorOpenTime();
 			myCommunicationService.motionDetected();
 		});

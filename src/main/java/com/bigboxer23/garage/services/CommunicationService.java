@@ -2,6 +2,8 @@ package com.bigboxer23.garage.services;
 
 import com.bigboxer23.utils.http.OkHttpUtil;
 import java.io.IOException;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Component;
  * Service to communicate status changes back to a central hub. If hub url isn't defined, does
  * nothing.
  */
+@Slf4j
 @Component
 public class CommunicationService extends BaseService {
 	@Value("${GarageOpenUrl}")
@@ -30,7 +33,7 @@ public class CommunicationService extends BaseService {
 	private String kGarageCloseWarningUrl;
 
 	public void garageDoorOpened() {
-		logger.info("Potentially Sending Notification " + myStatusService.isHouseDoorRecentlyOpened());
+		log.info("Potentially Sending Notification " + myStatusService.isHouseDoorRecentlyOpened());
 		// Don't trigger notification if house door was recently used, assuming someone inside the
 		// house is opening it
 		if (!myStatusService.isHouseDoorRecentlyOpened()) {
@@ -40,7 +43,7 @@ public class CommunicationService extends BaseService {
 	}
 
 	public void garageDoorClosing() {
-		logger.debug("garageDoorClosing");
+		log.debug("garageDoorClosing");
 		doAction(kGarageCloseWarningUrl);
 	}
 
@@ -49,12 +52,12 @@ public class CommunicationService extends BaseService {
 	}
 
 	public void motionDetected() {
-		logger.debug("informing motion url");
+		log.debug("informing motion url");
 		doAction(kMotionUrl);
 	}
 
 	public void houseDoorOpened() {
-		logger.info("House door opened");
+		log.info("House door opened");
 		doAction(kHouseDoorUrl);
 	}
 
@@ -65,7 +68,7 @@ public class CommunicationService extends BaseService {
 		try {
 			OkHttpUtil.getSynchronous(theUrl, null);
 		} catch (IOException e) {
-			logger.warn("error doing action: " + theUrl, e);
+			log.warn("error doing action: " + theUrl, e);
 		}
 	}
 }

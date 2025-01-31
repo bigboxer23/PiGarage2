@@ -6,11 +6,13 @@ import com.bigboxer23.garage.services.BaseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 /** Controller to return data about sensor's input */
+@Slf4j
 @RestController
 @EnableAutoConfiguration
 @Tag(name = "Garage Controller", description = "Service to control the garage door pi")
@@ -26,7 +28,7 @@ public class WebServiceController extends BaseService {
 			description = "Gets various statuses associated with the garage's current state (temp,"
 					+ " humidity, state, autoclose, etc)")
 	public GarageData getStatus() {
-		logger.debug("Checking status requested");
+		log.debug("Checking status requested");
 		return getGarageData();
 	}
 
@@ -43,7 +45,7 @@ public class WebServiceController extends BaseService {
 	@GetMapping(value = "/Close", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(summary = "close the garage", description = "If open, this endpoint will trigger garage closing")
 	public GarageData close() {
-		logger.info("Closing door requested");
+		log.info("Closing door requested");
 		myActionService.closeDoor();
 		myStatusService.setAutoCloseDelay(-1);
 		GarageData aData = getGarageData();
@@ -54,7 +56,7 @@ public class WebServiceController extends BaseService {
 	@GetMapping(value = "/Open", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(summary = "open the garage", description = "If closed, this endpoint will trigger garage opening")
 	public GarageData open() {
-		logger.info("Opening door requested");
+		log.info("Opening door requested");
 		myActionService.openDoor();
 		GarageData aData = getGarageData();
 		aData.setAutoClose(kAutoCloseDelay);
@@ -84,7 +86,7 @@ public class WebServiceController extends BaseService {
 			description = "Turns auto close off for delay defined by the path variable")
 	public GarageData setAutoCloseDelay(
 			@Parameter(description = "how long to delay auto close, in ms") @PathVariable(value = "delay") Long delay) {
-		logger.info("set auto close requested: " + delay);
+		log.info("set auto close requested: " + delay);
 		myStatusService.setAutoCloseDelay(delay);
 		return getGarageData();
 	}
@@ -94,7 +96,7 @@ public class WebServiceController extends BaseService {
 			summary = "disables auto close of the garage by 3 hours",
 			description = "Turns auto close off for the next three hours")
 	public GarageData disableAutoClose() {
-		logger.info("disabling auto close requested.");
+		log.info("disabling auto close requested.");
 		myStatusService.disableAutoClose();
 		return getGarageData();
 	}

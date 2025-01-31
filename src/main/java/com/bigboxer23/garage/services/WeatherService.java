@@ -1,10 +1,12 @@
 package com.bigboxer23.garage.services;
 
 import com.bigboxer23.garage.sensors.DHT22Sensor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /** Service to get temperature and humidity from a connected sensor */
+@Slf4j
 @Component
 public class WeatherService extends BaseService {
 	private DHT22Sensor mySensor;
@@ -20,18 +22,18 @@ public class WeatherService extends BaseService {
 	}
 
 	public float getTemperature() {
-		logger.debug("Last update: " + myLastUpdate);
+		log.debug("Last update: " + myLastUpdate);
 		return myCachedTemperature;
 	}
 
 	public float getHumidity() {
-		logger.debug("Last update: " + myLastUpdate);
+		log.debug("Last update: " + myLastUpdate);
 		return myCachedHumidity;
 	}
 
 	@Scheduled(fixedRate = 5000)
 	private void refreshInformation() {
-		logger.debug("Getting new sensorData...");
+		log.debug("Getting new sensorData...");
 		myCachedTemperature = mySensor.getTemperature();
 		myCachedHumidity = mySensor.getHumidity();
 		myLastUpdate = System.currentTimeMillis();

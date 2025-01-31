@@ -1,13 +1,13 @@
 package com.bigboxer23.garage.sensors;
 
 import java.nio.charset.Charset;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** Wrapper around the adafruit driver to return temp and humidity from a DHT22 Sensor */
+@Slf4j
 public class DHT22Sensor {
-	private static final Logger myLogger = LoggerFactory.getLogger(DHT22Sensor.class);
 
 	private static final String kTemp = "Temp =";
 	private static final String kHumidity = "Hum =";
@@ -31,9 +31,9 @@ public class DHT22Sensor {
 
 	public void checkForUpdates() {
 		String aValues = readValues();
-		myLogger.debug("Values read: " + aValues);
+		log.debug("Values read: " + aValues);
 		if (aValues != null && aValues.indexOf('%') > 0) {
-			myLogger.debug("Updating values.");
+			log.debug("Updating values.");
 			myLastValue = aValues;
 		}
 	}
@@ -65,20 +65,20 @@ public class DHT22Sensor {
 	private String readValues() {
 		try {
 			for (int ai = 0; ai < 10; ai++) {
-				myLogger.debug("Reading value from sensor");
+				log.debug("Reading value from sensor");
 				Process aProcess = Runtime.getRuntime().exec(String.format("Adafruit_DHT 22 %d", myPin));
 				String aResult = IOUtils.toString(aProcess.getInputStream(), Charset.defaultCharset());
-				myLogger.debug("done reading value from sensor...");
+				log.debug("done reading value from sensor...");
 				if (aResult.contains("Temp")) {
 					myLastUpdate = System.currentTimeMillis();
 					return aResult;
 				}
-				myLogger.debug("Bad result from sensor " + aResult);
+				log.debug("Bad result from sensor " + aResult);
 				Thread.sleep(1000);
 			}
 			return null;
 		} catch (Exception theException) {
-			myLogger.error(String.format("Could not read the DHT22 sensor at pin %d", myPin), theException);
+			log.error(String.format("Could not read the DHT22 sensor at pin %d", myPin), theException);
 			return null;
 		}
 	}
@@ -94,13 +94,13 @@ public class DHT22Sensor {
 
 	private void killHungAdafruit_DHTProcess() {
 		try {
-			myLogger.debug("Killing hung process, last update " + myLastUpdate);
+			log.debug("Killing hung process, last update " + myLastUpdate);
 			int aProcessResult =
 					Runtime.getRuntime().exec("sudo killall -9 Adafruit_DHT").waitFor();
-			myLogger.info(aProcessResult + " Sensor process is hung, killing process. Last update " + myLastUpdate);
+			log.info(aProcessResult + " Sensor process is hung, killing process. Last update " + myLastUpdate);
 			myLastUpdate = System.currentTimeMillis();
 		} catch (Exception theE) {
-			myLogger.error("killHungAdafruit_DHTProcess", theE);
+			log.error("killHungAdafruit_DHTProcess", theE);
 		}
 	}
 }

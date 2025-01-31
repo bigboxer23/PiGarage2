@@ -4,12 +4,14 @@ import com.bigboxer23.garage.util.GPIOUtils;
 import com.bigboxer23.garage.util.GpioPinDigitalFactory;
 import com.bigboxer23.garage.util.GpioPinDigitalOutputFacade;
 import com.pi4j.io.gpio.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
  * Service to open or close the garage door by interfacing with Raspberry Pi's GPIO and a relay
  * wired to the door opener
  */
+@Slf4j
 @Component
 public class GarageDoorActionService extends BaseService {
 	private final GpioPinDigitalOutputFacade pinTrigger;
@@ -25,7 +27,7 @@ public class GarageDoorActionService extends BaseService {
 	/** Close the door if it is open */
 	public void closeDoor() {
 		if (myStatusService.isGarageDoorOpen()) {
-			logger.debug("Closing the door.");
+			log.debug("Closing the door.");
 			doDoorAction();
 		}
 	}
@@ -33,7 +35,7 @@ public class GarageDoorActionService extends BaseService {
 	/** Open the door if it is already closed */
 	public void openDoor() {
 		if (!myStatusService.isGarageDoorOpen()) {
-			logger.debug("Opening the door.");
+			log.debug("Opening the door.");
 			doDoorAction();
 		}
 	}

@@ -2,13 +2,13 @@ package com.bigboxer23.garage.util;
 
 import com.pi4j.io.gpio.*;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** */
+@Slf4j
 public class GpioPinDigitalInputFacade {
-	private static final Logger logger = LoggerFactory.getLogger(GpioPinDigitalOutputFacade.class);
 	private Optional<GpioPinDigitalInput> pin;
 
 	private boolean high = false;
@@ -17,7 +17,7 @@ public class GpioPinDigitalInputFacade {
 		try {
 			this.pin = Optional.ofNullable(GpioFactory.getInstance().provisionDigitalInputPin(pin, resistance));
 		} catch (UnsatisfiedLinkError e) {
-			logger.warn("GpioPinDigitalInputFacade: can't load GPIO library, maybe not running on pi");
+			log.warn("GpioPinDigitalInputFacade: can't load GPIO library, maybe not running on pi");
 			this.pin = Optional.empty();
 		}
 	}
