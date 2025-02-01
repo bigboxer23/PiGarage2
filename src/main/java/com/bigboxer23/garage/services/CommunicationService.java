@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class CommunicationService extends BaseService {
+
 	@Value("${GarageOpenUrl}")
 	private String kOpenUrl;
 
