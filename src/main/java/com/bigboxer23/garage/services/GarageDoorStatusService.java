@@ -5,6 +5,8 @@ import com.bigboxer23.garage.util.GpioPinDigitalFactory;
 import com.bigboxer23.garage.util.GpioPinDigitalInputFacade;
 import com.bigboxer23.utils.file.FilePersistedString;
 import com.pi4j.io.gpio.*;
+import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
+import java.time.Clock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -44,75 +46,85 @@ public class GarageDoorStatusService extends BaseService {
 
 	private GpioPinDigitalInputFacade myHouseDoorPin;
 
-	private long myLastOpenHouseDoor = System.currentTimeMillis();
+	private long myLastOpenHouseDoor;
 
 	/**
 	 * Persisted so the last open time survives restarts (written once per open, negligible SD wear)
 	 */
-	private final FilePersistedString historicOpenTimeFile = new FilePersistedString("garageHistoricOpenTime");
+	private final FilePersistedString historicOpenTimeFile;
 
-	private long historicOpenTime = readHistoricOpenTime();
+	private long historicOpenTime;
 
 	private long lastGarageDoorEvent = -1;
 
+	private final Clock clock;
+
 	public GarageDoorStatusService() {
-		myGarageDoorPin = GpioPinDigitalFactory.getInstance()
-				.provisionDigitalInputPin(
-						GPIOUtils.getPin(Integer.getInteger("GPIO.status.pin", 2)), PinPullResistance.PULL_DOWN);
-		/*
-		 * Listen for status changes.  These can apparently trigger multiple times even
-		 * when the status isn't really changing, so we use the open time as our gauge for "last"
-		 * status, and don't set close status (or open) unless we're moving from the opposite
-		 * state.
-		 *
-		 * @param theEvent
-		 */
-		myGarageDoorPin.addListener(event -> {
-			if (lastGarageDoorEvent + 2000 > System.currentTimeMillis()) {
-				log.debug("ignoring garage open/close event for debounce: "
-						+ event.getState().isHigh()
-						+ " "
-						+ isGarageDoorOpen());
-				return;
-			}
-			lastGarageDoorEvent = System.currentTimeMillis();
-			if (isGarageDoorOpen() && myOpenTime < 0) {
-				myOpenTime = System.currentTimeMillis() + kAutoCloseDelay;
-				setHistoricOpenTime(System.currentTimeMillis());
-				log.info("Garage Door Opened.");
-				myCommunicationService.garageDoorOpened();
-			}
-			if (!isGarageDoorOpen() && myOpenTime != -1) {
-				myOpenTime = -1;
-				log.info("Garage Door Closed.");
-				myCommunicationService.garageDoorClosed();
-			}
-		});
+		this(GpioPinDigitalFactory.getInstance(), Clock.systemUTC(), new FilePersistedString("garageHistoricOpenTime"));
+	}
+
+	GarageDoorStatusService(GpioPinDigitalFactory gpioFactory, Clock clock, FilePersistedString historicOpenTimeFile) {
+		this.clock = clock;
+		this.historicOpenTimeFile = historicOpenTimeFile;
+		myLastOpenHouseDoor = clock.millis();
+		historicOpenTime = readHistoricOpenTime();
+		myGarageDoorPin = gpioFactory.provisionDigitalInputPin(
+				GPIOUtils.getPin(Integer.getInteger("GPIO.status.pin", 2)), PinPullResistance.PULL_DOWN);
+		myGarageDoorPin.addListener(this::onGarageDoorPinEvent);
 		if (isGarageDoorOpen()) {
-			myOpenTime = System.currentTimeMillis() + kAutoCloseDelay;
+			myOpenTime = clock.millis() + kAutoCloseDelay;
 			if (historicOpenTime < 0) {
-				setHistoricOpenTime(System.currentTimeMillis());
+				setHistoricOpenTime(clock.millis());
 			}
 		}
 		log.info("GarageDoorStatusService Startup:"
 				+ (isGarageDoorOpen() ? "Garage Door Opened." : "Garage Door Closed."));
-		myHouseDoorPin = GpioPinDigitalFactory.getInstance()
-				.provisionDigitalInputPin(
-						GPIOUtils.getPin(Integer.getInteger("GPIO.status.house.pin", 6)), PinPullResistance.PULL_UP);
+		myHouseDoorPin = gpioFactory.provisionDigitalInputPin(
+				GPIOUtils.getPin(Integer.getInteger("GPIO.status.house.pin", 6)), PinPullResistance.PULL_UP);
 		myHouseDoorPin.setDebounce(kHousePinDebounceMs);
-		myHouseDoorPin.addListener(theEvent -> {
-			if (theEvent.getState() == PinState.HIGH) {
-				long now = System.currentTimeMillis();
-				if (now - myLastOpenHouseDoor < kHouseDoorRepeatMs) {
-					log.debug("House door opened within repeat window, ignoring.");
-					return;
-				}
-				myLastOpenHouseDoor = now;
-				resetGarageDoorOpenTime();
-				myCommunicationService.houseDoorOpened();
-				// Maybe?: myActionService.openDoor();
-			}
-		});
+		myHouseDoorPin.addListener(this::onHouseDoorPinEvent);
+	}
+
+	/**
+	 * Listen for status changes. These can apparently trigger multiple times even when the status
+	 * isn't really changing, so we use the open time as our gauge for "last" status, and don't set
+	 * close status (or open) unless we're moving from the opposite state.
+	 */
+	private void onGarageDoorPinEvent(GpioPinDigitalStateChangeEvent event) {
+		if (lastGarageDoorEvent + 2000 > clock.millis()) {
+			log.debug("ignoring garage open/close event for debounce: "
+					+ event.getState().isHigh()
+					+ " "
+					+ isGarageDoorOpen());
+			return;
+		}
+		lastGarageDoorEvent = clock.millis();
+		if (isGarageDoorOpen() && myOpenTime < 0) {
+			myOpenTime = clock.millis() + kAutoCloseDelay;
+			setHistoricOpenTime(clock.millis());
+			log.info("Garage Door Opened.");
+			myCommunicationService.garageDoorOpened();
+		}
+		if (!isGarageDoorOpen() && myOpenTime != -1) {
+			myOpenTime = -1;
+			log.info("Garage Door Closed.");
+			myCommunicationService.garageDoorClosed();
+		}
+	}
+
+	private void onHouseDoorPinEvent(GpioPinDigitalStateChangeEvent event) {
+		if (event.getState() != PinState.HIGH) {
+			return;
+		}
+		long now = clock.millis();
+		if (now - myLastOpenHouseDoor < kHouseDoorRepeatMs) {
+			log.debug("House door opened within repeat window, ignoring.");
+			return;
+		}
+		myLastOpenHouseDoor = now;
+		resetGarageDoorOpenTime();
+		myCommunicationService.houseDoorOpened();
+		// Maybe?: myActionService.openDoor();
 	}
 
 	private boolean isHouseDoorOpen() {
@@ -123,13 +135,8 @@ public class GarageDoorStatusService extends BaseService {
 	 * @return true if opened within 5 seconds
 	 */
 	public boolean isHouseDoorRecentlyOpened() {
-		log.warn("time: "
-				+ System.currentTimeMillis()
-				+ " "
-				+ myLastOpenHouseDoor
-				+ " "
-				+ (System.currentTimeMillis() - myLastOpenHouseDoor));
-		return System.currentTimeMillis() - myLastOpenHouseDoor <= 15000;
+		log.warn("time: " + clock.millis() + " " + myLastOpenHouseDoor + " " + (clock.millis() - myLastOpenHouseDoor));
+		return clock.millis() - myLastOpenHouseDoor <= 15000;
 	}
 
 	public long getLastHouseDoorOpen() {
@@ -137,9 +144,9 @@ public class GarageDoorStatusService extends BaseService {
 	}
 
 	public void resetGarageDoorOpenTime() {
-		if (isGarageDoorOpen() && myOpenTime > 0 && (myOpenTime - System.currentTimeMillis()) < kAutoCloseDelay) {
+		if (isGarageDoorOpen() && myOpenTime > 0 && (myOpenTime - clock.millis()) < kAutoCloseDelay) {
 			log.debug("Resetting close time");
-			myOpenTime = System.currentTimeMillis() + kAutoCloseDelay;
+			myOpenTime = clock.millis() + kAutoCloseDelay;
 		}
 	}
 
@@ -149,7 +156,7 @@ public class GarageDoorStatusService extends BaseService {
 	 * @return milliseconds until auto close happens
 	 */
 	public long getAutoCloseTimeRemaining() {
-		return Math.max(0, myOpenTime - System.currentTimeMillis());
+		return Math.max(0, myOpenTime - clock.millis());
 	}
 
 	/**
@@ -160,11 +167,11 @@ public class GarageDoorStatusService extends BaseService {
 		myTempState = !isGarageDoorOpen();
 		// Garage door takes 12 seconds to open, only get state after that amount of time has
 		// passed.
-		myChangingStateDelay = System.currentTimeMillis() + (12 * 1000);
+		myChangingStateDelay = clock.millis() + (12 * 1000);
 	}
 
 	public boolean isGarageDoorOpen() {
-		if (myChangingStateDelay > System.currentTimeMillis()) {
+		if (myChangingStateDelay > clock.millis()) {
 			return myTempState;
 		}
 		myChangingStateDelay = -1;
@@ -176,7 +183,7 @@ public class GarageDoorStatusService extends BaseService {
 	public void setAutoCloseDelay(long theOpenTime) {
 		if (isGarageDoorOpen()) {
 			log.info("setting auto close delay " + theOpenTime);
-			myOpenTime = System.currentTimeMillis() + theOpenTime;
+			myOpenTime = clock.millis() + theOpenTime;
 		}
 	}
 
@@ -194,24 +201,24 @@ public class GarageDoorStatusService extends BaseService {
 		log.debug("open time: "
 				+ myOpenTime
 				+ " current: "
-				+ System.currentTimeMillis()
+				+ clock.millis()
 				+ " check: "
-				+ (System.currentTimeMillis() - myOpenTime));
-		if (myOpenTime > 0 && (System.currentTimeMillis() - myOpenTime - 30000) > 0) {
+				+ (clock.millis() - myOpenTime));
+		if (myOpenTime > 0 && (clock.millis() - myOpenTime - 30000) > 0) {
 			myCommunicationService.garageDoorClosing();
 		}
-		if (myOpenTime > 0 && (System.currentTimeMillis() - myOpenTime) > 0) {
+		if (myOpenTime > 0 && (clock.millis() - myOpenTime) > 0) {
 			log.info("Garage has been open too long, closing.");
 			if (!isGarageDoorOpen()) {
 				myOpenTime = -1;
 				return;
 			}
-			myOpenTime = System.currentTimeMillis() + kAutoCloseDelay;
+			myOpenTime = clock.millis() + kAutoCloseDelay;
 			myActionService.closeDoor();
 		}
 		if (myOpenTime == -1 && isGarageDoorOpen()) {
 			log.warn("Detected unset open time and open garage door, setting open time");
-			myOpenTime = System.currentTimeMillis() + kAutoCloseDelay;
+			myOpenTime = clock.millis() + kAutoCloseDelay;
 		}
 	}
 
