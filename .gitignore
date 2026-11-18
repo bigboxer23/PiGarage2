@@ -1,0 +1,39 @@
+# Maven
+target/
+dependency-reduced-pom.xml
+release.properties
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+
+# Local config & secrets (see README for setup)
+src/main/resources/application.properties
+*.p12
+*.jks
+*.keystore
+
+# IntelliJ IDEA (keep shared project settings that are already tracked)
+.idea/*
+!.idea/checkstyle-idea.xml
+!.idea/vcs.xml
+*.iml
+*.iws
+*.ipr
+out/
+
+# Eclipse / VS Code
+.classpath
+.project
+.settings/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Runtime state written by FilePersisted* utils
+.index_*
