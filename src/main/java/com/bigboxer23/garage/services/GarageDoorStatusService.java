@@ -23,6 +23,12 @@ public class GarageDoorStatusService extends BaseService {
 
 	private static final long kDisableAutoCloseDelay = 1000 * 60 * 60 * 3;
 
+	/** Hardware level debounce to filter contact bounce on the house door sensor */
+	private static final int kHousePinDebounceMs = 50;
+
+	/** Ignore repeat house door opens within this window (bounce/noise, not a real second open) */
+	private static final long kHouseDoorRepeatMs = 2000;
+
 	/** Last time the door was detected open */
 	private long myOpenTime = -1;
 
@@ -85,9 +91,15 @@ public class GarageDoorStatusService extends BaseService {
 		myHouseDoorPin = GpioPinDigitalFactory.getInstance()
 				.provisionDigitalInputPin(
 						GPIOUtils.getPin(Integer.getInteger("GPIO.status.house.pin", 6)), PinPullResistance.PULL_UP);
+		myHouseDoorPin.setDebounce(kHousePinDebounceMs);
 		myHouseDoorPin.addListener(theEvent -> {
-			if (isHouseDoorOpen()) {
-				myLastOpenHouseDoor = System.currentTimeMillis();
+			if (theEvent.getState() == PinState.HIGH) {
+				long now = System.currentTimeMillis();
+				if (now - myLastOpenHouseDoor < kHouseDoorRepeatMs) {
+					log.debug("House door opened within repeat window, ignoring.");
+					return;
+				}
+				myLastOpenHouseDoor = now;
 				resetGarageDoorOpenTime();
 				myCommunicationService.houseDoorOpened();
 				// Maybe?: myActionService.openDoor();

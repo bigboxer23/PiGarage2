@@ -2,7 +2,6 @@ package com.bigboxer23.garage.services;
 
 import com.bigboxer23.utils.http.OkHttpUtil;
 import java.io.IOException;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
