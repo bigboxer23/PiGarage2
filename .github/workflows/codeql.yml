@@ -9,7 +9,8 @@ jobs:
   analyze:
     name: Analyze
     runs-on: ubuntu-latest
-    if: ${{ github.actor == 'dependabot[bot]' || github.actor == 'bigboxer23'}}
+    # pull_request_target runs with secrets, so only build PR code from branches in this repo (never forks)
+    if: ${{ (github.actor == 'dependabot[bot]' || github.actor == 'bigboxer23') && (github.event_name != 'pull_request_target' || github.event.pull_request.head.repo.full_name == github.repository) }}
     permissions:
       actions: read
       contents: read
@@ -23,7 +24,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
-          ref: ${{ github.ref }}
+          # github.ref is the base branch for pull_request_target; build the PR's head instead
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
@@ -40,7 +42,8 @@ jobs:
             servers: '[{"id": "github", "username": "dummy", "password": "${GITHUB_TOKEN_REF}"}]'
             githubServer: false
       -   name: Run Tests with Maven
-          run: mvn clean compile -f "pom.xml" -B -V -e -Dfindbugs.skip -Dcheckstyle.skip -Dpmd.skip=true -Dspotbugs.skip -Denforcer.skip -Dmaven.javadoc.skip -DskipTests -Dmaven.test.skip.exec -Dlicense.skip=true -Drat.skip=true -Dspotless.check.skip=true
+          # stop at test: package would read application.properties and scp to the pi
+          run: mvn clean test -f "pom.xml" -B -V -e -Dfindbugs.skip -Dcheckstyle.skip -Dpmd.skip=true -Dspotbugs.skip -Denforcer.skip -Dmaven.javadoc.skip -Dlicense.skip=true -Drat.skip=true -Dspotless.check.skip=true -Dspotless.apply.skip=true
           env:
             GITHUB_TOKEN_REF: ${{ secrets.GH_PAT_FOR_ACTIONS_TOKEN }}
 
