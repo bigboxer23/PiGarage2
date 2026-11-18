@@ -3,6 +3,7 @@ package com.bigboxer23.garage.services;
 import com.bigboxer23.garage.util.GPIOUtils;
 import com.bigboxer23.garage.util.GpioPinDigitalFactory;
 import com.bigboxer23.garage.util.GpioPinDigitalInputFacade;
+import com.bigboxer23.utils.file.FilePersistedString;
 import com.pi4j.io.gpio.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -45,7 +46,12 @@ public class GarageDoorStatusService extends BaseService {
 
 	private long myLastOpenHouseDoor = System.currentTimeMillis();
 
-	private long historicOpenTime = -1;
+	/**
+	 * Persisted so the last open time survives restarts (written once per open, negligible SD wear)
+	 */
+	private final FilePersistedString historicOpenTimeFile = new FilePersistedString("garageHistoricOpenTime");
+
+	private long historicOpenTime = readHistoricOpenTime();
 
 	private long lastGarageDoorEvent = -1;
 
@@ -72,7 +78,7 @@ public class GarageDoorStatusService extends BaseService {
 			lastGarageDoorEvent = System.currentTimeMillis();
 			if (isGarageDoorOpen() && myOpenTime < 0) {
 				myOpenTime = System.currentTimeMillis() + kAutoCloseDelay;
-				historicOpenTime = System.currentTimeMillis();
+				setHistoricOpenTime(System.currentTimeMillis());
 				log.info("Garage Door Opened.");
 				myCommunicationService.garageDoorOpened();
 			}
@@ -84,7 +90,9 @@ public class GarageDoorStatusService extends BaseService {
 		});
 		if (isGarageDoorOpen()) {
 			myOpenTime = System.currentTimeMillis() + kAutoCloseDelay;
-			historicOpenTime = System.currentTimeMillis();
+			if (historicOpenTime < 0) {
+				setHistoricOpenTime(System.currentTimeMillis());
+			}
 		}
 		log.info("GarageDoorStatusService Startup:"
 				+ (isGarageDoorOpen() ? "Garage Door Opened." : "Garage Door Closed."));
@@ -209,5 +217,23 @@ public class GarageDoorStatusService extends BaseService {
 
 	public long getHistoricOpenTime() {
 		return historicOpenTime;
+	}
+
+	private void setHistoricOpenTime(long time) {
+		historicOpenTime = time;
+		historicOpenTimeFile.set(String.valueOf(time));
+	}
+
+	private long readHistoricOpenTime() {
+		String value = historicOpenTimeFile.get();
+		if (value == null || value.isEmpty()) {
+			return -1;
+		}
+		try {
+			return Long.parseLong(value);
+		} catch (NumberFormatException e) {
+			log.warn("invalid persisted historic open time: " + value, e);
+			return -1;
+		}
 	}
 }
