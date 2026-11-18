@@ -2,9 +2,8 @@ package com.bigboxer23.garage.util;
 
 import com.pi4j.io.gpio.*;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 
 /** */
 @Slf4j
@@ -24,6 +23,10 @@ public class GpioPinDigitalInputFacade {
 
 	public boolean isHigh() {
 		return pin.map(GpioPinDigital::isHigh).orElse(high);
+	}
+
+	public void setDebounce(int debounceMs) {
+		pin.ifPresent(p -> p.setDebounce(debounceMs));
 	}
 
 	public void addListener(GpioPinListenerDigital listener) {

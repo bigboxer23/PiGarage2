@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +31,9 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 										url = "https://github.com/bigboxer23/PiGarage2")))
 public class GarageOpenerApplication implements SchedulingConfigurer {
 	public static void main(String[] args) {
+		// Exceptions on background threads (e.g. pi4j GPIO listeners) otherwise only go to stdout
+		Thread.setDefaultUncaughtExceptionHandler((thread, e) -> LoggerFactory.getLogger(GarageOpenerApplication.class)
+				.error("Uncaught exception in thread " + thread.getName(), e));
 		SpringApplication.run(GarageOpenerApplication.class, args);
 	}
 
